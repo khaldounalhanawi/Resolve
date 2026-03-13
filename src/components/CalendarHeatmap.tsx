@@ -98,11 +98,32 @@ export function CalendarHeatmap({
       </View>
       
       <View style={styles.legend}>
-        <Text style={styles.legendText}>Far from target</Text>
-        <View style={[styles.legendBox, { backgroundColor: COLORS.heatmap.low }]} />
-        <View style={[styles.legendBox, { backgroundColor: COLORS.heatmap.mid }]} />
-        <View style={[styles.legendBox, { backgroundColor: COLORS.heatmap.high }]} />
-        <Text style={styles.legendText}>On target</Text>
+        <Text style={styles.legendLabel}>Far from target</Text>
+        <View style={styles.legendGradient}>
+          {[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0].map((value, index) => {
+            // Generate gradient colors from red to green
+            const getGradientColor = (v: number): string => {
+              const colors = [
+                '#d32f2f', '#e53935', '#f44336', '#ff5722', '#ff9800',
+                '#ffc107', '#cddc39', '#8bc34a', '#66bb6a', '#4caf50', '#2e7d32'
+              ];
+              const segmentSize = 1 / (colors.length - 1);
+              const segmentIndex = Math.floor(v / segmentSize);
+              return colors[Math.min(segmentIndex, colors.length - 1)];
+            };
+            
+            return (
+              <View
+                key={index}
+                style={[
+                  styles.legendGradientBox,
+                  { backgroundColor: getGradientColor(value) }
+                ]}
+              />
+            );
+          })}
+        </View>
+        <Text style={styles.legendLabel}>On target</Text>
       </View>
     </View>
   );
@@ -154,7 +175,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 12,
-    gap: 8,
+    gap: 6,
+  },
+  legendLabel: {
+    fontSize: 10,
+    color: COLORS.gray,
+    fontWeight: '500',
+  },
+  legendGradient: {
+    flexDirection: 'row',
+    gap: 2,
+  },
+  legendGradientBox: {
+    width: 16,
+    height: 16,
+    borderRadius: 2,
   },
   legendText: {
     fontSize: 11,
