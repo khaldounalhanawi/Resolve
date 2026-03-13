@@ -14,7 +14,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Animated,
-  Image,
 } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { useAppStore } from '../store';
@@ -42,68 +41,6 @@ export function HomeScreen() {
   const handleAddSuggestedMetrics = async () => {
     for (const suggestion of SUGGESTED_METRICS) {
       await addMetric(suggestion);
-    }
-  };
-
-  // Calculate progress statistics
-  const calculateProgress = () => {
-    if (entries.length === 0 || metrics.length === 0) {
-      return null;
-    }
-
-    // Get metrics with targets
-    const metricsWithTargets = metrics.filter(m => m.targetValue);
-    if (metricsWithTargets.length === 0) {
-      return null;
-    }
-
-    // Calculate days tracking
-    const allDates = [...new Set(entries.map(e => e.date))].sort();
-    const daysTracking = allDates.length;
-    const firstDate = allDates[0];
-    
-    // Calculate improvements
-    let improvedCount = 0;
-    
-    for (const metric of metricsWithTargets) {
-      const metricEntries = entries.filter(e => e.metricId === metric.id).sort((a, b) => a.date.localeCompare(b.date));
-      
-      if (metricEntries.length >= 2 && metric.targetValue) {
-        const firstEntry = metricEntries[0];
-        const recentEntries = metricEntries.slice(-7); // Last 7 days average
-        const recentAvg = recentEntries.reduce((sum, e) => sum + e.value, 0) / recentEntries.length;
-        
-        // Check if getting closer to target
-        const firstDistance = Math.abs(firstEntry.value - metric.targetValue);
-        const recentDistance = Math.abs(recentAvg - metric.targetValue);
-        
-        if (recentDistance < firstDistance) {
-          improvedCount++;
-        }
-      }
-    }
-
-    return {
-      improved: improvedCount > 0,
-      improvedCount,
-      totalWithTargets: metricsWithTargets.length,
-      daysTracking,
-      firstDate,
-    };
-  };
-
-  const progress = calculateProgress();
-
-  // Generate motivational message
-  const getMotivationalMessage = () => {
-    if (!progress) {
-      return null;
-    }
-
-    if (progress.improved) {
-      return `🎯 ${progress.improvedCount} metric${progress.improvedCount > 1 ? 's are' : ' is'} getting closer to target!`;
-    } else {
-      return `💪 Keep at it! You're already ${progress.daysTracking} day${progress.daysTracking > 1 ? 's' : ''} in!`;
     }
   };
 
@@ -164,19 +101,8 @@ export function HomeScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.userSection}>
-          <Image 
-            source={user?.avatarUrl ? { uri: user.avatarUrl } : require('../../assets/Resolve_logo.png')}
-            style={styles.avatar}
-          />
-          <View>
-            <Text style={styles.greeting}>Hello, {user?.name || 'User'}! 👋</Text>
-            <Text style={styles.date}>{formatDisplayDate(today)}</Text>
-            {getMotivationalMessage() && (
-              <Text style={styles.motivation}>{getMotivationalMessage()}</Text>
-            )}
-          </View>
-        </View>
+        <Text style={styles.greeting}>Hello, {user?.name || 'User'}! 👋</Text>
+        <Text style={styles.date}>{formatDisplayDate(today)}</Text>
       </View>
 
       <ScrollView
@@ -184,6 +110,7 @@ export function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        <Text style={styles.sectionTitle}>Categories</Text>
         {metricsWithValues.map(({ metric, value }) => (
           <Swipeable
             key={metric.id}
@@ -203,16 +130,8 @@ export function HomeScreen() {
           onPress={() => setIsAddModalVisible(true)}
         >
           <Text style={styles.addButtonIcon}>+</Text>
-          <Text style={styles.addButtonText}>Add New Metric</Text>
+          <Text style={styles.addButtonText}>Add New Category</Text>
         </TouchableOpacity>
-
-        {metrics.length > 0 && (
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>
-              Tap Calendar or Analytics below to see your data 📊
-            </Text>
-          </View>
-        )}
       </ScrollView>
 
       <AddMetricModal
@@ -270,6 +189,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 32,
     paddingVertical: 16,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
   setupButtonText: {
     color: COLORS.white,
@@ -279,28 +203,11 @@ const styles = StyleSheet.create({
   header: {
     padding: 20,
     paddingTop: 60,
-    paddingBottom: 16,
-    backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.lightGray,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  userSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: COLORS.lightGray,
+    paddingBottom: 24,
+    backgroundColor: COLORS.background,
   },
   greeting: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '700',
     color: COLORS.black,
     marginBottom: 4,
@@ -309,35 +216,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.gray,
   },
-  motivation: {
-    fontSize: 13,
-    color: COLORS.primary,
-    fontWeight: '600',
-    marginTop: 4,
-  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: 12,
-    paddingBottom: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 32,
   },
-  footer: {
-    marginTop: 12,
-    marginBottom: 20,
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: 13,
-    color: COLORS.gray,
-    textAlign: 'center',
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.black,
+    marginBottom: 16,
   },
   deleteAction: {
     backgroundColor: COLORS.error,
     justifyContent: 'center',
     alignItems: 'flex-end',
-    borderRadius: 8,
-    marginBottom: 8,
+    borderRadius: 16,
+    marginBottom: 12,
   },
   deleteButton: {
     width: 80,
@@ -352,15 +249,20 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: COLORS.white,
-    borderRadius: 8,
-    padding: 16,
-    marginVertical: 12,
+    borderRadius: 16,
+    padding: 20,
+    marginTop: 12,
     borderWidth: 2,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.secondary,
     borderStyle: 'dashed',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
   addButtonIcon: {
     fontSize: 24,

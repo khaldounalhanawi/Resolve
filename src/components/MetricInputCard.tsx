@@ -55,7 +55,10 @@ export function MetricInputCard({ metric, currentValue, onSave, onEdit }: Metric
         style={[styles.container, styles.collapsedContainer, { borderLeftColor: metric.color || COLORS.primary }]}
         onPress={() => setIsExpanded(true)}
       >
-        <Text style={styles.metricName}>{metric.name}</Text>
+        <View style={styles.collapsedLeft}>
+          <View style={[styles.colorDot, { backgroundColor: metric.color || COLORS.primary }]} />
+          <Text style={styles.metricName}>{metric.name}</Text>
+        </View>
         <Text style={styles.collapsedValue}>
           {currentValue.toFixed(1)}{metric.unit || ''}
         </Text>
@@ -66,25 +69,30 @@ export function MetricInputCard({ metric, currentValue, onSave, onEdit }: Metric
   // Expanded view - show slider and controls
   return (
     <View style={[styles.container, { borderLeftColor: metric.color || COLORS.primary }]}>
-      <View style={styles.compactRow}>
-        <Text style={styles.metricName}>{metric.name}</Text>
-        <View style={styles.sliderContainer}>
-          <Text style={styles.minLabel}>{metric.minValue}</Text>
-          <Slider
-            style={styles.slider}
-            minimumValue={metric.minValue}
-            maximumValue={metric.maxValue}
-            value={sliderValue}
-            onValueChange={setSliderValue}
-            minimumTrackTintColor={metric.color || COLORS.primary}
-            maximumTrackTintColor={COLORS.lightGray}
-            thumbTintColor={metric.color || COLORS.primary}
-          />
-          <Text style={styles.maxLabel}>{metric.maxValue}</Text>
+      <View style={styles.headerRow}>
+        <View style={styles.collapsedLeft}>
+          <View style={[styles.colorDot, { backgroundColor: metric.color || COLORS.primary }]} />
+          <Text style={styles.metricName}>{metric.name}</Text>
         </View>
         <Text style={styles.valueText}>
           {displayValue.toFixed(1)}{metric.unit || ''}
         </Text>
+      </View>
+      <View style={styles.sliderContainer}>
+        <Slider
+          style={styles.slider}
+          minimumValue={metric.minValue}
+          maximumValue={metric.maxValue}
+          value={sliderValue}
+          onValueChange={setSliderValue}
+          minimumTrackTintColor={metric.color || COLORS.primary}
+          maximumTrackTintColor={COLORS.secondary}
+          thumbTintColor={metric.color || COLORS.primary}
+        />
+        <View style={styles.sliderLabels}>
+          <Text style={styles.minLabel}>{metric.minValue}</Text>
+          <Text style={styles.maxLabel}>{metric.maxValue}</Text>
+        </View>
       </View>
 
       <View style={styles.buttonRow}>
@@ -106,26 +114,42 @@ export function MetricInputCard({ metric, currentValue, onSave, onEdit }: Metric
 const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.white,
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 8,
-    borderLeftWidth: 3,
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 12,
+    borderLeftWidth: 0,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
   },
   collapsedContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 14,
+    paddingVertical: 16,
+  },
+  collapsedLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  colorDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   collapsedValue: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     color: COLORS.primary,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   compactRow: {
     flexDirection: 'row',
@@ -133,39 +157,36 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   metricName: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
     color: COLORS.black,
-    width: 70,
   },
   sliderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    marginHorizontal: 8,
-    paddingVertical: 12,
-    minHeight: 60,
+    flexDirection: 'column',
+    marginBottom: 12,
   },
   slider: {
-    flex: 1,
-    height: 50,
+    width: '100%',
+    height: 40,
+  },
+  sliderLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 4,
   },
   minLabel: {
     fontSize: 12,
     color: COLORS.gray,
-    width: 30,
   },
   maxLabel: {
     fontSize: 12,
     color: COLORS.gray,
-    width: 30,
-    textAlign: 'right',
   },
   valueText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     color: COLORS.primary,
-    width: 60,
+    width: 70,
     textAlign: 'right',
   },
   buttonRow: {
@@ -175,11 +196,16 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: COLORS.primary,
-    borderRadius: 6,
-    paddingVertical: 12,
+    borderRadius: 10,
+    paddingVertical: 14,
     paddingHorizontal: 16,
     alignItems: 'center',
     flex: 1,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
   },
   saveButtonText: {
     color: COLORS.white,
@@ -188,12 +214,12 @@ const styles = StyleSheet.create({
   },
   editButton: {
     backgroundColor: COLORS.background,
-    borderRadius: 6,
-    paddingVertical: 12,
+    borderRadius: 10,
+    paddingVertical: 14,
     paddingHorizontal: 16,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.lightGray,
+    borderColor: COLORS.secondary,
   },
   editButtonText: {
     color: COLORS.gray,

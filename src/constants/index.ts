@@ -8,38 +8,41 @@ import { CreateMetricDTO } from '../models';
 
 /**
  * Color palette for metric visualization
- * Modern minimalistic theme based on brand colors
+ * Blue theme based on style1.png
  */
 export const COLORS = {
-  primary: '#355176',      // Dark blue - main brand color
-  secondary: '#8db8d4',    // Light blue - secondary accents
-  success: '#3ca55e',      // Green - success states
+  primary: '#1473b1',      // Dark blue - main brand color (from style1.png)
+  primaryLight: '#0f81e6', // Bright blue - hover/active states
+  secondary: '#b1d6f2',    // Medium blue - slider tracks, secondary elements
+  success: '#1473b1',      // Blue - success states
   warning: '#e8a55c',      // Warm orange for warnings
   error: '#d96c6c',        // Soft red for errors
-  gray: '#7a8a9e',         // Derived from primary blue
-  lightGray: '#c5d4e0',    // Light gray with blue tint
-  background: '#dafafc',   // Very light cyan - main background
+  gray: '#3b3b3b',         // Dark gray for secondary text
+  lightGray: '#c1c1c1',    // Light gray for borders
+  background: '#cce3f6',   // Light blue - main background (from style1.png)
+  cardBackground: '#efe6c8', // Beige/cream - card background alternative
   white: '#FFFFFF',
-  black: '#1a2733',        // Slightly softer black with blue tint
+  black: '#1c1c1c',        // Dark text color (from style1.png)
+  navy: '#1c1c1c',         // Navy/black - for consistent naming
   
   // Heatmap colors
   heatmap: {
     low: '#d96c6c',        // Soft red
     mid: '#e8a55c',        // Warm orange
-    high: '#3ca55e',       // Green
-    empty: '#e8f4f5',      // Very light background tint
+    high: '#1473b1',       // Blue
+    empty: '#cce3f6',      // Light background tint
   },
   
-  // Chart colors - modern palette matching theme
+  // Chart colors - blue palette matching theme
   chartColors: [
-    '#355176',  // Primary dark blue
-    '#8db8d4',  // Light blue
-    '#3ca55e',  // Green
-    '#5a9fb8',  // Medium blue
-    '#6abf7e',  // Light green
-    '#4d6a89',  // Darker blue
-    '#a8c9db',  // Pale blue
-    '#58b378',  // Medium green
+    '#1473b1',  // Primary dark blue
+    '#0f81e6',  // Bright blue
+    '#b1d6f2',  // Light blue
+    '#1b6fa0',  // Medium dark blue
+    '#5aa4d4',  // Medium blue
+    '#7fb9e3',  // Lighter blue
+    '#345f7f',  // Deep blue
+    '#cce3f6',  // Very light blue
   ],
 };
 
@@ -56,11 +59,11 @@ export const DATE_FORMATS = {
  * Default metric color mapping
  */
 export const METRIC_COLORS: Record<string, string> = {
-  Weight: '#355176',
-  Sleep: '#8db8d4',
-  Mood: '#3ca55e',
-  Calories: '#5a9fb8',
-  Steps: '#6abf7e',
+  Weight: '#1473b1',
+  Sleep: '#0f81e6',
+  Mood: '#1473b1',
+  Calories: '#5aa4d4',
+  Steps: '#7fb9e3',
 };
 
 /**
