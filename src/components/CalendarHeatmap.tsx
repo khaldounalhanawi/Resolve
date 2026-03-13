@@ -115,8 +115,9 @@ export function CalendarHeatmap({
       
       // Calculate position between worst case and target
       const range = Math.abs(target - worstValue);
+      if (range === 0) return getGradientColor(1.0); // target === worst, treat as green
       const position = Math.abs(value - worstValue);
-      const colorValue = position / range;
+      const colorValue = Math.max(0, Math.min(1, position / range));
       
       return getGradientColor(colorValue);
     }
@@ -250,20 +251,18 @@ export function CalendarHeatmap({
       <View style={styles.legend}>
         <Text style={styles.legendLabel}>
           {(() => {
-            // Calculate legend values based on target and initial value
-            if (metric.targetValue !== undefined && initialValue !== null) {
-              // Special case: if initial equals target, show worst deviation
-              if (initialValue === metric.targetValue) {
-                const worstValue = Math.abs(metric.maxValue - metric.targetValue) > 
-                                   Math.abs(metric.minValue - metric.targetValue) 
-                                   ? metric.maxValue : metric.minValue;
+            if (metric.targetValue !== undefined) {
+              // If direction is set, use min (ascending) or max (descending) as the red end
+              if (metric.direction) {
+                const worstValue = metric.direction === 'ascending' ? metric.minValue : metric.maxValue;
                 return `${worstValue}${metric.unit ? ` ${metric.unit}` : ''}`;
               }
-              // Calculate worst case: same distance from initial but in opposite direction from target
-              const distanceToTarget = initialValue - metric.targetValue;
-              const worstCase = Math.round(initialValue + distanceToTarget);
-              return `${worstCase}${metric.unit ? ` ${metric.unit}` : ''}`;
-            } else if (metric.targetValue !== undefined) {
+              // Legacy: use initial value to compute worst case
+              if (initialValue !== null && initialValue !== metric.targetValue) {
+                const distanceToTarget = initialValue - metric.targetValue;
+                const worstCase = Math.round(initialValue + distanceToTarget);
+                return `${worstCase}${metric.unit ? ` ${metric.unit}` : ''}`;
+              }
               // Fallback: use the bound farthest from target
               const distanceFromMin = Math.abs(metric.targetValue - metric.minValue);
               const distanceFromMax = Math.abs(metric.targetValue - metric.maxValue);
