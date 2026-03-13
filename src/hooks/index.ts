@@ -33,6 +33,8 @@ export function useMetricsWithTodayValues() {
  * Hook to get entries for a specific date
  */
 export function useEntriesForDate(date: string) {
+  const metrics = useAppStore(state => state.metrics);
+  const entries = useAppStore(state => state.entries);
   const [data, setData] = useState<Array<{ metric: Metric; entry: Entry | null }>>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -49,8 +51,10 @@ export function useEntriesForDate(date: string) {
       }
     };
     
-    loadData();
-  }, [date]);
+    if (date) {
+      loadData();
+    }
+  }, [date, metrics, entries]);
 
   return { data, isLoading };
 }

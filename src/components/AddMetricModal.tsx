@@ -83,7 +83,7 @@ export function AddMetricModal({ visible, onClose, onAdd }: AddMetricModalProps)
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={styles.form} showsVerticalScrollIndicator={false}>
+          <ScrollView style={styles.form} showsVerticalScrollIndicator={false} contentContainerStyle={styles.formContent}>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Name *</Text>
               <TextInput
@@ -230,6 +230,9 @@ const styles = StyleSheet.create({
   },
   form: {
     padding: 20,
+  },
+  formContent: {
+    paddingBottom: 40,
   },
   inputGroup: {
     marginBottom: 20,

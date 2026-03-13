@@ -136,13 +136,6 @@ export function HomeScreen() {
     );
   };
 
-  // Calculate today's stats
-  const todayStats = {
-    logged: metricsWithValues.filter(m => m.value > 0).length,
-    total: metrics.length,
-    percentage: metrics.length > 0 ? Math.round((metricsWithValues.filter(m => m.value > 0).length / metrics.length) * 100) : 0,
-  };
-
   if (isLoading && metrics.length === 0) {
     return (
       <View style={styles.loadingContainer}>
@@ -184,13 +177,6 @@ export function HomeScreen() {
             )}
           </View>
         </View>
-        
-        {metrics.length > 0 && (
-          <View style={styles.statsPreview}>
-            <Text style={styles.statsNumber}>{todayStats.logged}/{todayStats.total}</Text>
-            <Text style={styles.statsLabel}>logged today</Text>
-          </View>
-        )}
       </View>
 
       <ScrollView
@@ -328,18 +314,6 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontWeight: '600',
     marginTop: 4,
-  },
-  statsPreview: {
-    alignItems: 'flex-end',
-  },
-  statsNumber: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: COLORS.primary,
-  },
-  statsLabel: {
-    fontSize: 12,
-    color: COLORS.gray,
   },
   scrollView: {
     flex: 1,
