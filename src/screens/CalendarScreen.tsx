@@ -66,28 +66,30 @@ export function CalendarScreen() {
         <Text style={styles.title}>Calendar</Text>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.metricSelector}>
-        {metrics.map((metric, index) => (
-          <TouchableOpacity
-            key={metric.id}
-            style={[
-              styles.metricTab,
-              selectedMetricIndex === index && styles.metricTabActive,
-              { borderBottomColor: metric.color || COLORS.primary },
-            ]}
-            onPress={() => setSelectedMetricIndex(index)}
-          >
-            <Text
+      <View style={styles.metricSelector}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.metricTabsContainer}>
+          {metrics.map((metric, index) => (
+            <TouchableOpacity
+              key={metric.id}
               style={[
-                styles.metricTabText,
-                selectedMetricIndex === index && styles.metricTabTextActive,
+                styles.metricTab,
+                selectedMetricIndex === index && styles.metricTabActive,
+                { borderBottomColor: metric.color || COLORS.primary },
               ]}
+              onPress={() => setSelectedMetricIndex(index)}
             >
-              {metric.name}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+              <Text
+                style={[
+                  styles.metricTabText,
+                  selectedMetricIndex === index && styles.metricTabTextActive,
+                ]}
+              >
+                {metric.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
 
       <View style={styles.monthNavigation}>
         <TouchableOpacity onPress={handlePrevMonth} style={styles.navButton}>
@@ -157,6 +159,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.lightGray,
+  },
+  metricTabsContainer: {
+    alignItems: 'center',
   },
   metricTab: {
     paddingHorizontal: 16,

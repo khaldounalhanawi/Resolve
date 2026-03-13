@@ -8,37 +8,38 @@ import { CreateMetricDTO } from '../models';
 
 /**
  * Color palette for metric visualization
+ * Modern minimalistic theme based on brand colors
  */
 export const COLORS = {
-  primary: '#007AFF',
-  secondary: '#5856D6',
-  success: '#34C759',
-  warning: '#FF9500',
-  error: '#FF3B30',
-  gray: '#8E8E93',
-  lightGray: '#C7C7CC',
-  background: '#F2F2F7',
+  primary: '#355176',      // Dark blue - main brand color
+  secondary: '#8db8d4',    // Light blue - secondary accents
+  success: '#3ca55e',      // Green - success states
+  warning: '#e8a55c',      // Warm orange for warnings
+  error: '#d96c6c',        // Soft red for errors
+  gray: '#7a8a9e',         // Derived from primary blue
+  lightGray: '#c5d4e0',    // Light gray with blue tint
+  background: '#dafafc',   // Very light cyan - main background
   white: '#FFFFFF',
-  black: '#000000',
+  black: '#1a2733',        // Slightly softer black with blue tint
   
   // Heatmap colors
   heatmap: {
-    low: '#FF3B30',
-    mid: '#FF9500',
-    high: '#34C759',
-    empty: '#E5E5EA',
+    low: '#d96c6c',        // Soft red
+    mid: '#e8a55c',        // Warm orange
+    high: '#3ca55e',       // Green
+    empty: '#e8f4f5',      // Very light background tint
   },
   
-  // Chart colors
+  // Chart colors - modern palette matching theme
   chartColors: [
-    '#007AFF',
-    '#5856D6',
-    '#FF9500',
-    '#FF2D55',
-    '#34C759',
-    '#5AC8FA',
-    '#FFCC00',
-    '#AF52DE',
+    '#355176',  // Primary dark blue
+    '#8db8d4',  // Light blue
+    '#3ca55e',  // Green
+    '#5a9fb8',  // Medium blue
+    '#6abf7e',  // Light green
+    '#4d6a89',  // Darker blue
+    '#a8c9db',  // Pale blue
+    '#58b378',  // Medium green
   ],
 };
 
@@ -55,11 +56,11 @@ export const DATE_FORMATS = {
  * Default metric color mapping
  */
 export const METRIC_COLORS: Record<string, string> = {
-  Weight: '#007AFF',
-  Sleep: '#5856D6',
-  Mood: '#FF9500',
-  Calories: '#FF2D55',
-  Steps: '#34C759',
+  Weight: '#355176',
+  Sleep: '#8db8d4',
+  Mood: '#3ca55e',
+  Calories: '#5a9fb8',
+  Steps: '#6abf7e',
 };
 
 /**

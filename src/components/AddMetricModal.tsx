@@ -25,8 +25,8 @@ interface AddMetricModalProps {
 }
 
 const METRIC_COLORS = [
-  '#4CAF50', '#2196F3', '#FF9800', '#9C27B0', 
-  '#F44336', '#00BCD4', '#FF5722', '#3F51B5'
+  '#355176', '#8db8d4', '#3ca55e', '#5a9fb8', 
+  '#6abf7e', '#4d6a89', '#a8c9db', '#58b378'
 ];
 
 export function AddMetricModal({ visible, onClose, onAdd }: AddMetricModalProps) {

@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   deleteAction: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: COLORS.error,
     justifyContent: 'center',
     alignItems: 'flex-end',
     borderRadius: 8,
