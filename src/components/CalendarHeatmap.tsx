@@ -95,24 +95,76 @@ export function CalendarHeatmap({
       return COLORS.heatmap.empty;
     }
     
-    // If we have an initial value and target, use them for color calculation
-    if (metric.targetValue !== undefined && initialValue !== null) {
-      const distanceToTarget = initialValue - metric.targetValue;
-      const worstCase = initialValue + distanceToTarget;
+    // If we have a target and direction, use them for color calculation
+    if (metric.targetValue !== undefined && metric.direction) {
+      const target = metric.targetValue;
+      const isAscending = metric.direction === 'ascending';
       
-      // Calculate how far the current value is from target
-      const distanceFromTarget = Math.abs(value - metric.targetValue);
+      // Determine worst case based on direction
+      const worstValue = isAscending ? metric.minValue : metric.maxValue;
       
-      // Calculate max distance (from worst case to target)
-      const maxDistance = Math.abs(worstCase - metric.targetValue);
-      
-      if (maxDistance === 0) {
-        return getGradientColor(1.0); // Green
+      // Clamp values at or beyond target (green)
+      if ((isAscending && value >= target) || (!isAscending && value <= target)) {
+        return getGradientColor(1.0); // Green - at or beyond target
       }
       
-      // Normalize: 0 = at worst case (red), 1 = at target (green)
-      const normalizedDistance = distanceFromTarget / maxDistance;
-      const colorValue = 1 - Math.min(normalizedDistance, 1);
+      // Clamp values at or beyond worst case (red)
+      if ((isAscending && value <= worstValue) || (!isAscending && value >= worstValue)) {
+        return getGradientColor(0.0); // Red - at or beyond worst case
+      }
+      
+      // Calculate position between worst case and target
+      const range = Math.abs(target - worstValue);
+      const position = Math.abs(value - worstValue);
+      const colorValue = position / range;
+      
+      return getGradientColor(colorValue);
+    }
+    
+    // If we have an initial value and target (legacy fallback)
+    if (metric.targetValue !== undefined && initialValue !== null) {
+      const target = metric.targetValue;
+      const initial = initialValue;
+      
+      // If initial equals target, we're already at goal - any deviation is bad
+      if (initial === target) {
+        const distance = Math.abs(value - target);
+        const maxDeviation = Math.max(
+          Math.abs(metric.maxValue - target),
+          Math.abs(metric.minValue - target)
+        );
+        if (distance === 0) return getGradientColor(1.0);
+        if (maxDeviation === 0) return getGradientColor(1.0);
+        const colorValue = 1 - Math.min(distance / maxDeviation, 1);
+        return getGradientColor(colorValue);
+      }
+      
+      const distanceToTarget = initial - target;
+      const worstCase = initial + distanceToTarget;
+      
+      // Determine if we're moving toward higher or lower values to reach target
+      const movingUp = target > initial; // true if trying to increase
+      
+      // Clamp values that are at or beyond target (better than goal)
+      if (movingUp && value >= target) {
+        return getGradientColor(1.0); // Green - at or beyond target
+      }
+      if (!movingUp && value <= target) {
+        return getGradientColor(1.0); // Green - at or beyond target
+      }
+      
+      // Clamp values that are at or beyond worst case
+      if (movingUp && value <= worstCase) {
+        return getGradientColor(0.0); // Red - at or beyond worst case
+      }
+      if (!movingUp && value >= worstCase) {
+        return getGradientColor(0.0); // Red - at or beyond worst case
+      }
+      
+      // Calculate position between worst case and target
+      const range = Math.abs(target - worstCase);
+      const position = Math.abs(value - worstCase);
+      const colorValue = position / range;
       
       return getGradientColor(colorValue);
     }
@@ -200,6 +252,13 @@ export function CalendarHeatmap({
           {(() => {
             // Calculate legend values based on target and initial value
             if (metric.targetValue !== undefined && initialValue !== null) {
+              // Special case: if initial equals target, show worst deviation
+              if (initialValue === metric.targetValue) {
+                const worstValue = Math.abs(metric.maxValue - metric.targetValue) > 
+                                   Math.abs(metric.minValue - metric.targetValue) 
+                                   ? metric.maxValue : metric.minValue;
+                return `${worstValue}${metric.unit ? ` ${metric.unit}` : ''}`;
+              }
               // Calculate worst case: same distance from initial but in opposite direction from target
               const distanceToTarget = initialValue - metric.targetValue;
               const worstCase = Math.round(initialValue + distanceToTarget);

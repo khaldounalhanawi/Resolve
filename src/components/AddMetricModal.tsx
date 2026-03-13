@@ -15,7 +15,7 @@ import {
   ScrollView,
   Switch,
 } from 'react-native';
-import { MetricType, AggregationType, CreateMetricDTO } from '../models';
+import { MetricType, AggregationType, CreateMetricDTO, Direction } from '../models';
 import { COLORS } from '../constants';
 
 interface AddMetricModalProps {
@@ -37,6 +37,7 @@ export function AddMetricModal({ visible, onClose, onAdd }: AddMetricModalProps)
   const [target, setTarget] = useState('5');
   const [selectedColor, setSelectedColor] = useState(METRIC_COLORS[0]);
   const [isAccumulate, setIsAccumulate] = useState(false);
+  const [direction, setDirection] = useState<Direction>('ascending');
 
   const handleAdd = () => {
     if (!name.trim()) {
@@ -50,6 +51,7 @@ export function AddMetricModal({ visible, onClose, onAdd }: AddMetricModalProps)
       minValue: parseFloat(minValue) || 0,
       maxValue: parseFloat(maxValue) || 10,
       targetValue: parseFloat(target) || undefined,
+      direction: direction,
       color: selectedColor,
       aggregationType: isAccumulate ? 'accumulate' : 'singleValue',
     };
@@ -64,6 +66,7 @@ export function AddMetricModal({ visible, onClose, onAdd }: AddMetricModalProps)
     setTarget('5');
     setSelectedColor(METRIC_COLORS[0]);
     setIsAccumulate(false);
+    setDirection('ascending');
     onClose();
   };
 
@@ -140,6 +143,45 @@ export function AddMetricModal({ visible, onClose, onAdd }: AddMetricModalProps)
                 placeholder="Your daily goal"
                 placeholderTextColor={COLORS.gray}
               />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Direction</Text>
+              <Text style={styles.hint}>
+                Specify what's better for this metric
+              </Text>
+              <View style={styles.directionPicker}>
+                <TouchableOpacity
+                  style={[
+                    styles.directionOption,
+                    direction === 'ascending' && styles.directionOptionSelected,
+                  ]}
+                  onPress={() => setDirection('ascending')}
+                >
+                  <Text style={[
+                    styles.directionText,
+                    direction === 'ascending' && styles.directionTextSelected,
+                  ]}>
+                    ↑ Higher is Better
+                  </Text>
+                  <Text style={styles.directionHint}>e.g., Steps, Mood, Sleep</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.directionOption,
+                    direction === 'descending' && styles.directionOptionSelected,
+                  ]}
+                  onPress={() => setDirection('descending')}
+                >
+                  <Text style={[
+                    styles.directionText,
+                    direction === 'descending' && styles.directionTextSelected,
+                  ]}>
+                    ↓ Lower is Better
+                  </Text>
+                  <Text style={styles.directionHint}>e.g., Weight Loss, Stress</Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
             <View style={styles.inputGroup}>
@@ -279,6 +321,36 @@ const styles = StyleSheet.create({
   colorOptionSelected: {
     borderColor: COLORS.black,
     borderWidth: 3,
+  },
+  directionPicker: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+  },
+  directionOption: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: COLORS.lightGray,
+    backgroundColor: COLORS.background,
+  },
+  directionOptionSelected: {
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.white,
+  },
+  directionText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.gray,
+    marginBottom: 4,
+  },
+  directionTextSelected: {
+    color: COLORS.primary,
+  },
+  directionHint: {
+    fontSize: 11,
+    color: COLORS.gray,
   },
   switchGroup: {
     flexDirection: 'row',

@@ -40,6 +40,10 @@ export const createMetric = mutation({
     minValue: v.number(),
     maxValue: v.number(),
     targetValue: v.optional(v.number()),
+    direction: v.optional(v.union(
+      v.literal("ascending"),
+      v.literal("descending")
+    )),
     aggregationType: v.union(
       v.literal("singleValue"),
       v.literal("accumulate")
@@ -82,6 +86,10 @@ export const updateMetric = mutation({
     minValue: v.optional(v.number()),
     maxValue: v.optional(v.number()),
     targetValue: v.optional(v.number()),
+    direction: v.optional(v.union(
+      v.literal("ascending"),
+      v.literal("descending")
+    )),
     aggregationType: v.optional(
       v.union(
         v.literal("singleValue"),

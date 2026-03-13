@@ -29,6 +29,10 @@ export default defineSchema({
     minValue: v.number(),
     maxValue: v.number(),
     targetValue: v.optional(v.number()),
+    direction: v.optional(v.union(
+      v.literal("ascending"),
+      v.literal("descending")
+    )),
     aggregationType: v.union(
       v.literal("singleValue"),
       v.literal("accumulate")

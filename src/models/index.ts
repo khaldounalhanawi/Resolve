@@ -30,6 +30,15 @@ export type MetricType = 'number' | 'scale' | 'boolean' | 'duration';
 export type AggregationType = 'singleValue' | 'accumulate';
 
 /**
+ * Direction Type
+ * 
+ * Defines whether higher or lower values are better:
+ * - ascending: Higher values are better (e.g., steps, mood)
+ * - descending: Lower values are better (e.g., weight loss, stress)
+ */
+export type Direction = 'ascending' | 'descending';
+
+/**
  * Metric Model
  * 
  * Represents a trackable metric defined by the user.
@@ -45,6 +54,7 @@ export interface Metric {
   minValue: number;
   maxValue: number;
   targetValue?: number;
+  direction?: Direction;
   aggregationType: AggregationType;
   color?: string;
   order?: number;
@@ -81,6 +91,7 @@ export interface CreateMetricDTO {
   minValue: number;
   maxValue: number;
   targetValue?: number;
+  direction?: Direction;
   aggregationType: AggregationType;
   color?: string;
 }
