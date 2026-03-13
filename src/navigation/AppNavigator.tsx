@@ -1,7 +1,7 @@
 /**
  * Navigation Configuration
  * 
- * Sets up the bottom tab navigation for the app.
+ * Sets up the bottom tab navigation for the app with swipe gestures.
  */
 
 import React from 'react';
@@ -25,13 +25,16 @@ export function AppNavigator() {
             backgroundColor: COLORS.white,
             borderTopWidth: 1,
             borderTopColor: COLORS.lightGray,
-            paddingBottom: 8,
+            paddingBottom: 20,
             paddingTop: 8,
-            height: 60,
+            height: 75,
+            position: 'absolute',
+            bottom: 0,
           },
           tabBarLabelStyle: {
             fontSize: 12,
             fontWeight: '600',
+            marginBottom: 4,
           },
         }}
       >

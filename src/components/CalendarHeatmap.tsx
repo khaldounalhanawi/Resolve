@@ -110,24 +110,25 @@ export function CalendarHeatmap({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: 12,
+    backgroundColor: COLORS.white,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     color: COLORS.black,
-    marginBottom: 16,
+    marginBottom: 12,
     textAlign: 'center',
   },
   weekDaysRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   weekDay: {
     width: 40,
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: COLORS.gray,
   },
@@ -144,7 +145,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.white,
   },
   dayText: {
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.black,
     fontWeight: '500',
   },
@@ -152,16 +153,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 12,
     gap: 8,
   },
   legendText: {
-    fontSize: 12,
+    fontSize: 11,
     color: COLORS.gray,
   },
   legendBox: {
-    width: 24,
-    height: 24,
+    width: 20,
+    height: 20,
     borderRadius: 4,
   },
 });

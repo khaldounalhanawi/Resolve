@@ -7,7 +7,8 @@
 import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
-import { AppNavigator } from './src/navigation';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SwipeableTabNavigator } from './src/navigation/SwipeableTabNavigator';
 import { useAppInitialization } from './src/hooks';
 import { COLORS } from './src/constants';
 
@@ -23,10 +24,10 @@ export default function App() {
   }
 
   return (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style="dark" />
-      <AppNavigator />
-    </>
+      <SwipeableTabNavigator />
+    </GestureHandlerRootView>
   );
 }
 

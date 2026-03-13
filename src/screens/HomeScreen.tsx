@@ -21,6 +21,7 @@ import { COLORS, SUGGESTED_METRICS } from '../constants';
 import { getTodayISO, formatDisplayDate } from '../utils/dateUtils';
 
 export function HomeScreen() {
+  const user = useAppStore(state => state.user);
   const metrics = useAppStore(state => state.metrics);
   const isLoading = useAppStore(state => state.isLoading);
   const logValue = useAppStore(state => state.logValue);
@@ -33,6 +34,13 @@ export function HomeScreen() {
     for (const suggestion of SUGGESTED_METRICS) {
       await addMetric(suggestion);
     }
+  };
+
+  // Calculate today's stats
+  const todayStats = {
+    logged: metricsWithValues.filter(m => m.value > 0).length,
+    total: metrics.length,
+    percentage: metrics.length > 0 ? Math.round((metricsWithValues.filter(m => m.value > 0).length / metrics.length) * 100) : 0,
   };
 
   if (isLoading && metrics.length === 0) {
@@ -63,8 +71,17 @@ export function HomeScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Today</Text>
-        <Text style={styles.date}>{formatDisplayDate(today)}</Text>
+        <View>
+          <Text style={styles.greeting}>Hello, {user?.name || 'User'}! 👋</Text>
+          <Text style={styles.date}>{formatDisplayDate(today)}</Text>
+        </View>
+        
+        {metrics.length > 0 && (
+          <View style={styles.statsPreview}>
+            <Text style={styles.statsNumber}>{todayStats.logged}/{todayStats.total}</Text>
+            <Text style={styles.statsLabel}>logged today</Text>
+          </View>
+        )}
       </View>
 
       <ScrollView
@@ -81,11 +98,13 @@ export function HomeScreen() {
           />
         ))}
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Keep logging daily to see patterns! 📊
-          </Text>
-        </View>
+        {metrics.length > 0 && (
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>
+              Tap Calendar or Analytics below to see your data 📊
+            </Text>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -95,6 +114,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+    paddingBottom: 75,
   },
   loadingContainer: {
     flex: 1,
@@ -108,6 +128,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: COLORS.background,
     padding: 32,
+    paddingBottom: 100,
   },
   emptyTitle: {
     fontSize: 28,
@@ -137,33 +158,50 @@ const styles = StyleSheet.create({
   header: {
     padding: 20,
     paddingTop: 60,
+    paddingBottom: 16,
     backgroundColor: COLORS.white,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.lightGray,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  title: {
-    fontSize: 32,
+  greeting: {
+    fontSize: 24,
     fontWeight: '700',
     color: COLORS.black,
     marginBottom: 4,
   },
   date: {
-    fontSize: 16,
+    fontSize: 14,
+    color: COLORS.gray,
+  },
+  statsPreview: {
+    alignItems: 'flex-end',
+  },
+  statsNumber: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
+  statsLabel: {
+    fontSize: 12,
     color: COLORS.gray,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
+    padding: 12,
+    paddingBottom: 20,
   },
   footer: {
-    marginTop: 20,
-    marginBottom: 40,
+    marginTop: 12,
+    marginBottom: 20,
     alignItems: 'center',
   },
   footerText: {
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.gray,
     textAlign: 'center',
   },

@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+    paddingBottom: 75,
   },
   emptyContainer: {
     flex: 1,
@@ -132,6 +133,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: COLORS.background,
     padding: 32,
+    paddingBottom: 100,
   },
   emptyText: {
     fontSize: 16,
@@ -141,12 +143,13 @@ const styles = StyleSheet.create({
   header: {
     padding: 20,
     paddingTop: 60,
+    paddingBottom: 12,
     backgroundColor: COLORS.white,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.lightGray,
   },
   title: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: '700',
     color: COLORS.black,
   },
@@ -156,8 +159,8 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.lightGray,
   },
   metricTab: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderBottomWidth: 3,
     borderBottomColor: 'transparent',
   },
@@ -165,7 +168,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
   },
   metricTabText: {
-    fontSize: 16,
+    fontSize: 14,
     color: COLORS.gray,
     fontWeight: '500',
   },
@@ -176,7 +179,7 @@ const styles = StyleSheet.create({
   monthNavigation: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 16,
+    padding: 12,
     backgroundColor: COLORS.white,
   },
   navButton: {

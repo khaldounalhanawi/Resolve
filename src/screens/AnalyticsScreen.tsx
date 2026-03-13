@@ -166,6 +166,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+    paddingBottom: 75,
   },
   emptyContainer: {
     flex: 1,
@@ -173,6 +174,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: COLORS.background,
     padding: 32,
+    paddingBottom: 100,
   },
   emptyText: {
     fontSize: 16,
@@ -182,40 +184,41 @@ const styles = StyleSheet.create({
   header: {
     padding: 20,
     paddingTop: 60,
+    paddingBottom: 12,
     backgroundColor: COLORS.white,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.lightGray,
   },
   title: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: '700',
     color: COLORS.black,
   },
   section: {
     backgroundColor: COLORS.white,
-    padding: 16,
+    padding: 12,
     marginTop: 8,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: COLORS.black,
-    marginBottom: 12,
+    marginBottom: 10,
   },
   metricChips: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 6,
   },
   metricChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
     backgroundColor: COLORS.background,
     borderWidth: 1,
     borderColor: COLORS.lightGray,
   },
   metricChipText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '500',
     color: COLORS.black,
   },
@@ -224,11 +227,11 @@ const styles = StyleSheet.create({
   },
   dateRangeButtons: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 6,
   },
   dateRangeButton: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderRadius: 8,
     backgroundColor: COLORS.background,
     alignItems: 'center',
@@ -237,7 +240,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   dateRangeButtonText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '500',
     color: COLORS.black,
   },
@@ -248,7 +251,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   emptyState: {
-    padding: 60,
+    padding: 40,
     alignItems: 'center',
   },
   emptyStateText: {
@@ -257,22 +260,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   insights: {
-    margin: 16,
-    padding: 16,
+    margin: 12,
+    padding: 12,
     backgroundColor: COLORS.white,
-    borderRadius: 12,
-    borderLeftWidth: 4,
+    borderRadius: 8,
+    borderLeftWidth: 3,
     borderLeftColor: COLORS.primary,
   },
   insightsTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
     color: COLORS.black,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   insightsText: {
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.gray,
-    lineHeight: 20,
+    lineHeight: 18,
   },
 });

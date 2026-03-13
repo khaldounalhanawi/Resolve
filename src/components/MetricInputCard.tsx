@@ -45,41 +45,31 @@ export function MetricInputCard({ metric, currentValue, onSave }: MetricInputCar
 
   return (
     <View style={[styles.container, { borderLeftColor: metric.color || COLORS.primary }]}>
-      <View style={styles.header}>
+      <View style={styles.compactRow}>
         <Text style={styles.metricName}>{metric.name}</Text>
+        <View style={styles.sliderContainer}>
+          <Text style={styles.minLabel}>{metric.minValue}</Text>
+          <Slider
+            style={styles.slider}
+            minimumValue={metric.minValue}
+            maximumValue={metric.maxValue}
+            value={sliderValue}
+            onValueChange={setSliderValue}
+            minimumTrackTintColor={metric.color || COLORS.primary}
+            maximumTrackTintColor={COLORS.lightGray}
+            thumbTintColor={metric.color || COLORS.primary}
+          />
+          <Text style={styles.maxLabel}>{metric.maxValue}</Text>
+        </View>
         <Text style={styles.valueText}>
-          {displayValue.toFixed(1)} {metric.unit || ''}
+          {displayValue.toFixed(1)}{metric.unit || ''}
         </Text>
       </View>
-
-      {metric.aggregationType === 'accumulate' && (
-        <Text style={styles.hint}>Add to today's total</Text>
-      )}
-
-      <Slider
-        style={styles.slider}
-        minimumValue={metric.minValue}
-        maximumValue={metric.maxValue}
-        value={sliderValue}
-        onValueChange={setSliderValue}
-        minimumTrackTintColor={metric.color || COLORS.primary}
-        maximumTrackTintColor={COLORS.lightGray}
-        thumbTintColor={metric.color || COLORS.primary}
-      />
-
-      <View style={styles.rangeLabels}>
-        <Text style={styles.rangeLabel}>{metric.minValue}</Text>
-        <Text style={styles.rangeLabel}>{metric.maxValue}</Text>
-      </View>
-
-      {metric.aggregationType === 'accumulate' && (
-        <Text style={styles.addValueText}>
-          +{sliderValue.toFixed(1)} {metric.unit || ''}
-        </Text>
-      )}
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Save</Text>
+        <Text style={styles.saveButtonText}>
+          {metric.aggregationType === 'accumulate' ? 'Add' : 'Update'}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -88,66 +78,66 @@ export function MetricInputCard({ metric, currentValue, onSave }: MetricInputCar
 const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.white,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderLeftWidth: 4,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
+    borderLeftWidth: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  header: {
+  compactRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
   },
   metricName: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '600',
     color: COLORS.black,
+    width: 70,
   },
-  valueText: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: COLORS.primary,
-  },
-  hint: {
-    fontSize: 12,
-    color: COLORS.gray,
-    marginBottom: 8,
+  sliderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginHorizontal: 8,
   },
   slider: {
-    width: '100%',
-    height: 40,
+    flex: 1,
+    height: 30,
   },
-  rangeLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  rangeLabel: {
-    fontSize: 12,
+  minLabel: {
+    fontSize: 11,
     color: COLORS.gray,
+    width: 30,
   },
-  addValueText: {
+  maxLabel: {
+    fontSize: 11,
+    color: COLORS.gray,
+    width: 30,
+    textAlign: 'right',
+  },
+  valueText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.success,
-    textAlign: 'center',
-    marginBottom: 12,
+    fontWeight: '700',
+    color: COLORS.primary,
+    width: 60,
+    textAlign: 'right',
   },
   saveButton: {
     backgroundColor: COLORS.primary,
-    borderRadius: 8,
-    padding: 12,
+    borderRadius: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     alignItems: 'center',
+    alignSelf: 'flex-end',
   },
   saveButtonText: {
     color: COLORS.white,
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: '600',
   },
 });
