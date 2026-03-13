@@ -13,10 +13,12 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
+import { Swipeable } from 'react-native-gesture-handler';
 import { useAppStore } from '../store';
 import { useMetricsWithTodayValues } from '../hooks';
-import { MetricInputCard } from '../components';
+import { MetricInputCard, AddMetricModal } from '../components';
 import { COLORS, SUGGESTED_METRICS } from '../constants';
 import { getTodayISO, formatDisplayDate } from '../utils/dateUtils';
 
@@ -26,6 +28,9 @@ export function HomeScreen() {
   const isLoading = useAppStore(state => state.isLoading);
   const logValue = useAppStore(state => state.logValue);
   const addMetric = useAppStore(state => state.addMetric);
+  const removeMetric = useAppStore(state => state.removeMetric);
+  
+  const [isAddModalVisible, setIsAddModalVisible] = React.useState(false);
   
   const metricsWithValues = useMetricsWithTodayValues();
   const today = getTodayISO();
@@ -34,6 +39,35 @@ export function HomeScreen() {
     for (const suggestion of SUGGESTED_METRICS) {
       await addMetric(suggestion);
     }
+  };
+
+  const renderRightActions = (metricId: string) => (
+    progress: Animated.AnimatedInterpolation<number>,
+    dragX: Animated.AnimatedInterpolation<number>
+  ) => {
+    const trans = dragX.interpolate({
+      inputRange: [-100, 0],
+      outputRange: [0, 100],
+      extrapolate: 'clamp',
+    });
+
+    return (
+      <Animated.View
+        style={[
+          styles.deleteAction,
+          {
+            transform: [{ translateX: trans }],
+          },
+        ]}
+      >
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => removeMetric(metricId)}
+        >
+          <Text style={styles.deleteButtonText}>Delete</Text>
+        </TouchableOpacity>
+      </Animated.View>
+    );
   };
 
   // Calculate today's stats
@@ -90,13 +124,25 @@ export function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         {metricsWithValues.map(({ metric, value }) => (
-          <MetricInputCard
+          <Swipeable
             key={metric.id}
-            metric={metric}
-            currentValue={value}
-            onSave={(newValue) => logValue(metric.id, newValue)}
-          />
+            renderRightActions={renderRightActions(metric.id)}
+          >
+            <MetricInputCard
+              metric={metric}
+              currentValue={value}
+              onSave={(newValue) => logValue(metric.id, newValue)}
+            />
+          </Swipeable>
         ))}
+
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => setIsAddModalVisible(true)}
+        >
+          <Text style={styles.addButtonIcon}>+</Text>
+          <Text style={styles.addButtonText}>Add New Metric</Text>
+        </TouchableOpacity>
 
         {metrics.length > 0 && (
           <View style={styles.footer}>
@@ -106,6 +152,12 @@ export function HomeScreen() {
           </View>
         )}
       </ScrollView>
+
+      <AddMetricModal
+        visible={isAddModalVisible}
+        onClose={() => setIsAddModalVisible(false)}
+        onAdd={(metric) => addMetric(metric)}
+      />
     </View>
   );
 }
@@ -204,5 +256,46 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.gray,
     textAlign: 'center',
+  },
+  deleteAction: {
+    backgroundColor: '#FF3B30',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  deleteButton: {
+    width: 80,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteButtonText: {
+    color: COLORS.white,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  addButton: {
+    backgroundColor: COLORS.white,
+    borderRadius: 8,
+    padding: 16,
+    marginVertical: 12,
+    borderWidth: 2,
+    borderColor: COLORS.primary,
+    borderStyle: 'dashed',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addButtonIcon: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: COLORS.primary,
+    marginRight: 8,
+  },
+  addButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.primary,
   },
 });

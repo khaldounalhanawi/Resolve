@@ -26,6 +26,7 @@ export function MetricInputCard({ metric, currentValue, onSave }: MetricInputCar
   const [sliderValue, setSliderValue] = useState(
     metric.aggregationType === 'accumulate' ? metric.minValue : currentValue
   );
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleSave = () => {
     const valueToAdd = metric.aggregationType === 'accumulate' 
@@ -37,12 +38,31 @@ export function MetricInputCard({ metric, currentValue, onSave }: MetricInputCar
     if (metric.aggregationType === 'accumulate') {
       setSliderValue(metric.minValue);
     }
+    
+    // Collapse after saving
+    setIsExpanded(false);
   };
 
   const displayValue = metric.aggregationType === 'accumulate'
     ? currentValue
     : sliderValue;
 
+  // Collapsed view - just show name and current value
+  if (!isExpanded) {
+    return (
+      <TouchableOpacity
+        style={[styles.container, styles.collapsedContainer, { borderLeftColor: metric.color || COLORS.primary }]}
+        onPress={() => setIsExpanded(true)}
+      >
+        <Text style={styles.metricName}>{metric.name}</Text>
+        <Text style={styles.collapsedValue}>
+          {currentValue.toFixed(1)}{metric.unit || ''}
+        </Text>
+      </TouchableOpacity>
+    );
+  }
+
+  // Expanded view - show slider and controls
   return (
     <View style={[styles.container, { borderLeftColor: metric.color || COLORS.primary }]}>
       <View style={styles.compactRow}>
@@ -87,6 +107,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 2,
+  },
+  collapsedContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 14,
+  },
+  collapsedValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.primary,
   },
   compactRow: {
     flexDirection: 'row',

@@ -8,3 +8,4 @@ export { MetricInputCard } from './MetricInputCard';
 export { CalendarHeatmap } from './CalendarHeatmap';
 export { DayDetailModal } from './DayDetailModal';
 export { CorrelationGraph } from './CorrelationGraph';
+export { AddMetricModal } from './AddMetricModal';
