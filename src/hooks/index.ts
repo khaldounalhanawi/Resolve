@@ -4,57 +4,85 @@
  * React hooks that provide convenient access to services and state.
  */
 
-import { useEffect, useState } from 'react';
-import { useAppStore } from '../store';
+import { useEffect, useState, useMemo } from 'react';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import { useAuth } from '../contexts/AuthContext';
 import { Metric, Entry } from '../models';
 import { getTodayISO } from '../utils/dateUtils';
-import * as entryService from '../services/entryService';
 
 /**
  * Hook to get metrics with their current day values
  */
 export function useMetricsWithTodayValues() {
-  const metrics = useAppStore(state => state.metrics);
-  const entries = useAppStore(state => state.entries);
+  const { userId } = useAuth();
   const today = getTodayISO();
+  
+  const metrics = useQuery(
+    api.metrics.getUserMetrics,
+    userId ? { userId } : 'skip'
+  );
+  
+  const entries = useQuery(
+    api.entries.getUserEntriesByDate,
+    userId ? { userId, date: today } : 'skip'
+  );
 
-  return metrics.map(metric => {
-    const todayEntry = entries.find(
-      e => e.metricId === metric.id && e.date === today
-    );
-    return {
-      metric,
-      value: todayEntry?.value || 0,
-    };
-  });
+  return useMemo(() => {
+    if (!metrics) return [];
+    
+    return metrics.map(metric => {
+      const todayEntry = entries?.find(
+        e => e.metricId === metric._id
+      );
+      return {
+        metric,
+        value: todayEntry?.value || 0,
+      };
+    });
+  }, [metrics, entries]);
 }
 
 /**
  * Hook to get entries for a specific date
  */
 export function useEntriesForDate(date: string) {
-  const metrics = useAppStore(state => state.metrics);
-  const entries = useAppStore(state => state.entries);
-  const [data, setData] = useState<Array<{ metric: Metric; entry: Entry | null }>>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { userId } = useAuth();
+  
+  const metrics = useQuery(
+    api.metrics.getUserMetrics,
+    userId ? { userId } : 'skip'
+  );
+  
+  const entries = useQuery(
+    api.entries.getUserEntriesByDate,
+    userId && date ? { userId, date } : 'skip'
+  );
 
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      try {
-        const result = await entryService.getMetricEntriesForDate(date);
-        setData(result);
-      } catch (error) {
-        console.error('Failed to load entries for date:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const data = useMemo(() => {
+    if (!metrics) return [];
     
-    if (date) {
-      loadData();
-    }
-  }, [date, metrics, entries]);
+    // Debug logging
+    console.log('useEntriesForDate - Date:', date);
+    console.log('useEntriesForDate - Metrics count:', metrics.length);
+    console.log('useEntriesForDate - Entries:', entries);
+    
+    return metrics.map(metric => {
+      // Convert both to string for comparison
+      const entry = entries?.find(e => String(e.metricId) === String(metric._id)) || null;
+      
+      if (entry) {
+        console.log(`Found entry for metric ${metric.name}:`, entry.value);
+      }
+      
+      return {
+        metric,
+        entry,
+      };
+    });
+  }, [metrics, entries, date]);
+
+  const isLoading = !date || metrics === undefined || entries === undefined;
 
   return { data, isLoading };
 }
@@ -63,28 +91,19 @@ export function useEntriesForDate(date: string) {
  * Hook to get entries for a metric in a date range
  */
 export function useMetricEntries(metricId: string, startDate: string, endDate: string) {
-  const [entries, setEntries] = useState<Entry[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { userId } = useAuth();
+  
+  const allEntries = useQuery(
+    api.entries.getUserEntriesInRange,
+    userId && startDate && endDate ? { userId, startDate, endDate } : 'skip'
+  );
 
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      try {
-        const result = await entryService.getEntriesForMetricInRange(
-          metricId,
-          startDate,
-          endDate
-        );
-        setEntries(result);
-      } catch (error) {
-        console.error('Failed to load metric entries:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadData();
-  }, [metricId, startDate, endDate]);
+  const entries = useMemo(() => {
+    if (!allEntries) return [];
+    return allEntries.filter(e => e.metricId === metricId) as Entry[];
+  }, [allEntries, metricId]);
+
+  const isLoading = allEntries === undefined;
 
   return { entries, isLoading };
 }
@@ -93,16 +112,10 @@ export function useMetricEntries(metricId: string, startDate: string, endDate: s
  * Hook to initialize the app
  */
 export function useAppInitialization() {
-  const loadUser = useAppStore(state => state.loadUser);
-  const loadMetrics = useAppStore(state => state.loadMetrics);
-  const loadAllEntries = useAppStore(state => state.loadAllEntries);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     const initialize = async () => {
-      await loadUser();
-      await loadMetrics();
-      await loadAllEntries();
       setIsInitialized(true);
     };
     

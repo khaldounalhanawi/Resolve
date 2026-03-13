@@ -4,18 +4,22 @@
  * This is the root component that initializes the app and sets up navigation.
  */
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { ConvexProvider, ConvexReactClient } from 'convex/react';
 import { SwipeableTabNavigator } from './src/navigation/SwipeableTabNavigator';
-import { useAppInitialization } from './src/hooks';
+import { AuthProvider, useAuth } from './src/contexts/AuthContext';
+import { LoginScreen } from './src/screens/LoginScreen';
 import { COLORS } from './src/constants';
 
-export default function App() {
-  const isInitialized = useAppInitialization();
+const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL || '');
 
-  if (!isInitialized) {
+function AppContent() {
+  const { userId, isLoading } = useAuth();
+
+  if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={COLORS.primary} />
@@ -23,11 +27,23 @@ export default function App() {
     );
   }
 
+  if (!userId) {
+    return <LoginScreen />;
+  }
+
+  return <SwipeableTabNavigator />;
+}
+
+export default function App() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar style="dark" />
-      <SwipeableTabNavigator />
-    </GestureHandlerRootView>
+    <ConvexProvider client={convex}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <StatusBar style="dark" />
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </GestureHandlerRootView>
+    </ConvexProvider>
   );
 }
 

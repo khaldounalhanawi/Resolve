@@ -2,10 +2,13 @@
  * User Model
  * 
  * Represents a user in the system.
+ * Compatible with both local storage and Convex
  */
 export interface User {
-  id: string;
+  id?: string;
+  _id?: string;  // Convex ID
   name: string;
+  email?: string;
   avatarUrl?: string;
   createdAt: number;
 }
@@ -30,10 +33,12 @@ export type AggregationType = 'singleValue' | 'accumulate';
  * Metric Model
  * 
  * Represents a trackable metric defined by the user.
+ * Compatible with both local storage and Convex
  */
 export interface Metric {
-  id: string;
-  userId: string;
+  id?: string;
+  _id?: string;  // Convex ID
+  userId?: string;
   name: string;
   type: MetricType;
   unit?: string;
@@ -42,6 +47,7 @@ export interface Metric {
   targetValue?: number;
   aggregationType: AggregationType;
   color?: string;
+  order?: number;
   createdAt: number;
 }
 
@@ -49,14 +55,18 @@ export interface Metric {
  * Entry Model
  * 
  * Represents a single data point for a metric on a specific date.
+ * Compatible with both local storage and Convex
  */
 export interface Entry {
-  id: string;
-  userId: string;
-  metricId: string;
+  id?: string;
+  _id?: string;  // Convex ID
+  userId?: string | any;  // string for local, Id<"users"> for Convex
+  metricId?: string | any;  // string for local, Id<"metrics"> for Convex
   date: string; // YYYY-MM-DD format
   value: number;
-  createdAt: number;
+  note?: string;
+  createdAt?: number;
+  updatedAt?: number;
 }
 
 /**

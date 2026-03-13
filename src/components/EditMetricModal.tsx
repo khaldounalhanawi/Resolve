@@ -67,7 +67,7 @@ export function EditMetricModal({ visible, metric, onClose, onUpdate }: EditMetr
       aggregationType: isAccumulate ? 'accumulate' : 'singleValue',
     };
 
-    onUpdate(metric.id, updates);
+    onUpdate(metric._id || metric.id || '', updates);
     onClose();
   };
 

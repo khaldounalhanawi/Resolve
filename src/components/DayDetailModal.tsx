@@ -44,7 +44,7 @@ export function DayDetailModal({ visible, date, data, onClose }: DayDetailModalP
 
           <ScrollView style={styles.scrollView}>
             {data.map(({ metric, entry }) => (
-              <View key={metric.id} style={styles.metricRow}>
+              <View key={metric._id || metric.id} style={styles.metricRow}>
                 <View style={styles.metricInfo}>
                   <View
                     style={[

@@ -7,3 +7,4 @@
 export { HomeScreen } from './HomeScreen';
 export { CalendarScreen } from './CalendarScreen';
 export { AnalyticsScreen } from './AnalyticsScreen';
+export { LoginScreen } from './LoginScreen';

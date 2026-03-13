@@ -5,7 +5,7 @@
  * Displays all metrics with slider inputs for quick data entry.
  */
 
-import React, { useEffect } from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,32 +16,84 @@ import {
   Animated,
 } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
-import { useAppStore } from '../store';
-import { useMetricsWithTodayValues } from '../hooks';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import { useAuth } from '../contexts/AuthContext';
 import { MetricInputCard, AddMetricModal, EditMetricModal } from '../components';
 import { COLORS, SUGGESTED_METRICS } from '../constants';
 import { getTodayISO, formatDisplayDate } from '../utils/dateUtils';
 
 export function HomeScreen() {
-  const user = useAppStore(state => state.user);
-  const metrics = useAppStore(state => state.metrics);
-  const entries = useAppStore(state => state.entries);
-  const isLoading = useAppStore(state => state.isLoading);
-  const logValue = useAppStore(state => state.logValue);
-  const addMetric = useAppStore(state => state.addMetric);
-  const updateMetric = useAppStore(state => state.updateMetric);
-  const removeMetric = useAppStore(state => state.removeMetric);
+  const { userId } = useAuth();
+  const today = getTodayISO();
+  
+  // Convex queries
+  const user = useQuery(api.users.getUser, userId ? { userId } : 'skip');
+  const metrics = useQuery(api.metrics.getUserMetrics, userId ? { userId } : 'skip');
+  const entries = useQuery(api.entries.getUserEntriesByDate, userId ? { userId, date: today } : 'skip');
+  
+  // Convex mutations
+  const createMetric = useMutation(api.metrics.createMetric);
+  const updateMetricMutation = useMutation(api.metrics.updateMetric);
+  const deleteMetric = useMutation(api.metrics.deleteMetric);
+  const upsertEntry = useMutation(api.entries.upsertEntry);
+  const accumulateEntry = useMutation(api.entries.accumulateEntry);
   
   const [isAddModalVisible, setIsAddModalVisible] = React.useState(false);
   const [editingMetric, setEditingMetric] = React.useState<any>(null);
   
-  const metricsWithValues = useMetricsWithTodayValues();
-  const today = getTodayISO();
+  // Calculate metrics with today's values
+  const metricsWithValues = useMemo(() => {
+    if (!metrics || !entries) return [];
+    
+    return metrics.map(metric => {
+      const todayEntry = entries.find(e => e.metricId === metric._id);
+      return {
+        metric,
+        value: todayEntry?.value || (metric.aggregationType === 'accumulate' ? 0 : metric.minValue)
+      };
+    });
+  }, [metrics, entries]);
 
   const handleAddSuggestedMetrics = async () => {
+    if (!userId) return;
     for (const suggestion of SUGGESTED_METRICS) {
-      await addMetric(suggestion);
+      await createMetric({ 
+        userId, 
+        ...suggestion,
+        color: suggestion.color || COLORS.primary 
+      });
     }
+  };
+
+  const handleLogValue = async (metricId: any, value: number) => {
+    if (!userId) return;
+    
+    const metric = metrics?.find(m => m._id === metricId);
+    if (!metric) return;
+
+    if (metric.aggregationType === 'accumulate') {
+      await accumulateEntry({ userId, metricId, date: today, value });
+    } else {
+      await upsertEntry({ userId, metricId, date: today, value });
+    }
+  };
+
+  const handleUpdateMetric = async (metricId: any, data: any) => {
+    await updateMetricMutation({ metricId, ...data });
+  };
+
+  const handleRemoveMetric = async (metricId: any) => {
+    await deleteMetric({ metricId });
+  };
+
+  const handleAddMetric = async (data: any) => {
+    if (!userId) return;
+    await createMetric({ 
+      userId, 
+      ...data,
+      color: data.color || COLORS.primary
+    });
   };
 
   const renderRightActions = (metricId: string) => (
@@ -65,7 +117,7 @@ export function HomeScreen() {
       >
         <TouchableOpacity
           style={styles.deleteButton}
-          onPress={() => removeMetric(metricId)}
+          onPress={() => handleRemoveMetric(metricId)}
         >
           <Text style={styles.deleteButtonText}>Delete</Text>
         </TouchableOpacity>
@@ -73,7 +125,9 @@ export function HomeScreen() {
     );
   };
 
-  if (isLoading && metrics.length === 0) {
+  const isLoading = !metrics || !entries || !user;
+
+  if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={COLORS.primary} />
@@ -81,7 +135,7 @@ export function HomeScreen() {
     );
   }
 
-  if (metrics.length === 0) {
+  if (metrics && metrics.length === 0) {
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyTitle}>Welcome to Resolve! 🎯</Text>
@@ -115,8 +169,8 @@ export function HomeScreen() {
         <Text style={styles.sectionTitle}>Categories</Text>
         {metricsWithValues.map(({ metric, value }) => (
           <Swipeable
-            key={metric.id}
-            renderRightActions={renderRightActions(metric.id)}
+            key={metric._id}
+            renderRightActions={renderRightActions(metric._id)}
             activeOffsetX={[-20, 20]}
             overshootLeft={false}
             overshootRight={false}
@@ -124,7 +178,7 @@ export function HomeScreen() {
             <MetricInputCard
               metric={metric}
               currentValue={value}
-              onSave={(newValue) => logValue(metric.id, newValue)}
+              onSave={(newValue) => handleLogValue(metric._id, newValue)}
               onEdit={() => setEditingMetric(metric)}
             />
           </Swipeable>
@@ -142,14 +196,14 @@ export function HomeScreen() {
       <AddMetricModal
         visible={isAddModalVisible}
         onClose={() => setIsAddModalVisible(false)}
-        onAdd={(metric) => addMetric(metric)}
+        onAdd={handleAddMetric}
       />
 
       <EditMetricModal
         visible={!!editingMetric}
         metric={editingMetric}
         onClose={() => setEditingMetric(null)}
-        onUpdate={(metricId, data) => updateMetric(metricId, data)}
+        onUpdate={handleUpdateMetric}
       />
     </View>
   );

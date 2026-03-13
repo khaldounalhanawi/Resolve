@@ -32,7 +32,8 @@ export function CorrelationGraph({ metrics, entriesByMetric }: CorrelationGraphP
   };
 
   const chartData = metrics.map((metric, index) => {
-    const entries = entriesByMetric[metric.id] || [];
+    const metricId = (metric._id || metric.id) as string;
+    const entries = entriesByMetric[metricId] || [];
     return {
       metric,
       data: entries.map(entry => ({
@@ -70,7 +71,7 @@ export function CorrelationGraph({ metrics, entriesByMetric }: CorrelationGraphP
         
         {chartData.map(({ metric, data, color }) => (
           <VictoryLine
-            key={metric.id}
+            key={metric._id || metric.id}
             data={data}
             style={{
               data: { stroke: color, strokeWidth: 2 },
@@ -81,7 +82,7 @@ export function CorrelationGraph({ metrics, entriesByMetric }: CorrelationGraphP
 
       <View style={styles.legend}>
         {metrics.map((metric, index) => (
-          <View key={metric.id} style={styles.legendItem}>
+          <View key={metric._id || metric.id} style={styles.legendItem}>
             <View
               style={[
                 styles.legendDot,

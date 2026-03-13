@@ -4,7 +4,7 @@
  * Displays a calendar heatmap for visualizing metric data over time.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,28 +14,41 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { addMonths, subMonths } from 'date-fns';
-import { useAppStore } from '../store';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import { useAuth } from '../contexts/AuthContext';
 import { useEntriesForDate } from '../hooks';
 import { CalendarHeatmap, DayDetailModal } from '../components';
 import { COLORS } from '../constants';
-import * as entryService from '../services/entryService';
 
 export function CalendarScreen() {
-  const metrics = useAppStore(state => state.metrics);
-  const entries = useAppStore(state => state.entries);
+  const { userId } = useAuth();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedMetricIndex, setSelectedMetricIndex] = useState(0);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
+  // Fetch metrics and entries from Convex
+  const metrics = useQuery(
+    api.metrics.getUserMetrics,
+    userId ? { userId } : 'skip'
+  );
+  const allEntries = useQuery(
+    api.entries.getUserEntries,
+    userId ? { userId } : 'skip'
+  );
+
   const { data: dayData, isLoading: isDayDataLoading } = useEntriesForDate(
     selectedDate || ''
   );
 
-  const selectedMetric = metrics[selectedMetricIndex];
-  const metricEntries = selectedMetric
-    ? entries.filter(e => e.metricId === selectedMetric.id)
-    : [];
+  const selectedMetric = metrics?.[selectedMetricIndex];
+  
+  // Filter entries for the selected metric
+  const metricEntries = useMemo(() => {
+    if (!selectedMetric || !allEntries) return [];
+    return allEntries.filter(e => e.metricId === selectedMetric._id);
+  }, [selectedMetric, allEntries]);
 
   const handleDayPress = (date: string) => {
     setSelectedDate(date);
@@ -50,7 +63,7 @@ export function CalendarScreen() {
     setCurrentMonth(prev => addMonths(prev, 1));
   };
 
-  if (metrics.length === 0) {
+  if (!metrics || metrics.length === 0) {
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>
@@ -70,7 +83,7 @@ export function CalendarScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.metricTabsContainer}>
           {metrics.map((metric, index) => (
             <TouchableOpacity
-              key={metric.id}
+              key={metric._id}
               style={[
                 styles.metricTab,
                 selectedMetricIndex === index && styles.metricTabActive,

@@ -5,7 +5,7 @@
  * Shows trends and patterns across multiple metrics.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,42 +14,52 @@ import {
   ScrollView,
 } from 'react-native';
 import { subDays } from 'date-fns';
-import { useAppStore } from '../store';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import { useAuth } from '../contexts/AuthContext';
 import { CorrelationGraph } from '../components';
 import { COLORS } from '../constants';
 import { dateToISO } from '../utils/dateUtils';
-import * as entryService from '../services/entryService';
 import { Entry } from '../models';
+import type { Id } from '../../convex/_generated/dataModel';
 
 export function AnalyticsScreen() {
-  const metrics = useAppStore(state => state.metrics);
+  const { userId } = useAuth();
   const [selectedMetricIds, setSelectedMetricIds] = useState<string[]>([]);
-  const [entriesByMetric, setEntriesByMetric] = useState<Record<string, Entry[]>>({});
   const [dateRange, setDateRange] = useState(30);
 
-  useEffect(() => {
-    const loadData = async () => {
-      const endDate = dateToISO(new Date());
-      const startDate = dateToISO(subDays(new Date(), dateRange));
+  // Fetch metrics from Convex
+  const metrics = useQuery(
+    api.metrics.getUserMetrics,
+    userId ? { userId } : 'skip'
+  );
 
-      const dataByMetric: Record<string, Entry[]> = {};
-      
-      for (const metricId of selectedMetricIds) {
-        const entries = await entryService.getEntriesForMetricInRange(
-          metricId,
-          startDate,
-          endDate
-        );
-        dataByMetric[metricId] = entries;
+  // Calculate date range
+  const { startDate, endDate } = useMemo(() => ({
+    startDate: dateToISO(subDays(new Date(), dateRange)),
+    endDate: dateToISO(new Date()),
+  }), [dateRange]);
+
+  // Fetch entries in date range
+  const allEntries = useQuery(
+    api.entries.getUserEntriesInRange,
+    userId ? { userId, startDate, endDate } : 'skip'
+  );
+
+  // Group entries by metric
+  const entriesByMetric = useMemo(() => {
+    if (!allEntries) return {};
+    
+    const grouped: Record<string, Entry[]> = {};
+    for (const entry of allEntries) {
+      const metricId = entry.metricId as string;
+      if (!grouped[metricId]) {
+        grouped[metricId] = [];
       }
-      
-      setEntriesByMetric(dataByMetric);
-    };
-
-    if (selectedMetricIds.length > 0) {
-      loadData();
+      grouped[metricId].push(entry as Entry);
     }
-  }, [selectedMetricIds, dateRange]);
+    return grouped;
+  }, [allEntries]);
 
   const toggleMetric = (metricId: string) => {
     setSelectedMetricIds(prev => {
@@ -61,9 +71,12 @@ export function AnalyticsScreen() {
     });
   };
 
-  const selectedMetrics = metrics.filter(m => selectedMetricIds.includes(m.id));
+  const selectedMetrics = useMemo(() => {
+    if (!metrics) return [];
+    return metrics.filter(m => selectedMetricIds.includes(m._id as string));
+  }, [metrics, selectedMetricIds]);
 
-  if (metrics.length === 0) {
+  if (!metrics || metrics.length === 0) {
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>
@@ -84,17 +97,18 @@ export function AnalyticsScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={styles.metricChips}>
             {metrics.map(metric => {
-              const isSelected = selectedMetricIds.includes(metric.id);
+              const metricId = metric._id as string;
+              const isSelected = selectedMetricIds.includes(metricId);
               return (
                 <TouchableOpacity
-                  key={metric.id}
+                  key={metricId}
                   style={[
                     styles.metricChip,
                     isSelected && {
                       backgroundColor: metric.color || COLORS.primary,
                     },
                   ]}
-                  onPress={() => toggleMetric(metric.id)}
+                  onPress={() => toggleMetric(metricId)}
                 >
                   <Text
                     style={[
