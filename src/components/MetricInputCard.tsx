@@ -91,17 +91,17 @@ export function MetricInputCard({ metric, currentValue, onSave, onEdit }: Metric
   // Expanded view - show slider and controls
   return (
     <View style={[styles.container, { borderLeftColor: metric.color || COLORS.primary }]}>
-      <View style={styles.headerRow}>
+      <TouchableOpacity style={styles.headerRow} onPress={() => setIsExpanded(false)} activeOpacity={0.7}>
         <View style={styles.collapsedLeft}>
           <View style={[styles.colorDot, { backgroundColor: metric.color || COLORS.primary }]} />
           <Text style={styles.metricName}>{metric.name}</Text>
         </View>
-        <TouchableOpacity onPress={handleDirectInput} style={styles.valueTouchable}>
+        <TouchableOpacity onPress={(e) => { e.stopPropagation(); handleDirectInput(); }} style={styles.valueTouchable}>
           <Text style={styles.valueText}>
             {displayValue.toFixed(1)}{metric.unit || ''}
           </Text>
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
       <View style={styles.sliderWrapper}>
       <View style={styles.sliderContainer}>
         <Slider
