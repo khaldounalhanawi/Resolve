@@ -81,26 +81,30 @@ export function CalendarScreen() {
 
       <View style={styles.metricSelector}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.metricTabsContainer}>
-          {metrics.map((metric, index) => (
-            <TouchableOpacity
-              key={metric._id}
-              style={[
-                styles.metricTab,
-                selectedMetricIndex === index && styles.metricTabActive,
-                { borderBottomColor: metric.color || COLORS.primary },
-              ]}
-              onPress={() => setSelectedMetricIndex(index)}
-            >
-              <Text
+          {metrics.map((metric, index) => {
+            const isSelected = selectedMetricIndex === index;
+            return (
+              <TouchableOpacity
+                key={metric._id}
                 style={[
-                  styles.metricTabText,
-                  selectedMetricIndex === index && styles.metricTabTextActive,
+                  styles.metricTab,
+                  isSelected && {
+                    backgroundColor: metric.color || COLORS.primary,
+                  },
                 ]}
+                onPress={() => setSelectedMetricIndex(index)}
               >
-                {metric.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text
+                  style={[
+                    styles.metricTabText,
+                    isSelected && styles.metricTabTextActive,
+                  ]}
+                >
+                  {metric.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
       </View>
 
@@ -178,21 +182,22 @@ const styles = StyleSheet.create({
   },
   metricTab: {
     paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderBottomWidth: 3,
-    borderBottomColor: 'transparent',
+    paddingVertical: 8,
+    marginHorizontal: 4,
+    borderRadius: 20,
+    backgroundColor: COLORS.lightGray,
   },
   metricTabActive: {
-    borderBottomWidth: 3,
+    // backgroundColor will be set dynamically based on metric color
   },
   metricTabText: {
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.gray,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   metricTabTextActive: {
-    color: COLORS.black,
-    fontWeight: '700',
+    color: COLORS.white,
+    fontWeight: '600',
   },
   monthNavigation: {
     flexDirection: 'row',

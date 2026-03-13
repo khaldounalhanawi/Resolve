@@ -98,11 +98,11 @@ export function CalendarHeatmap({
       </View>
       
       <View style={styles.legend}>
-        <Text style={styles.legendText}>Less</Text>
+        <Text style={styles.legendText}>Far from target</Text>
         <View style={[styles.legendBox, { backgroundColor: COLORS.heatmap.low }]} />
         <View style={[styles.legendBox, { backgroundColor: COLORS.heatmap.mid }]} />
         <View style={[styles.legendBox, { backgroundColor: COLORS.heatmap.high }]} />
-        <Text style={styles.legendText}>More</Text>
+        <Text style={styles.legendText}>On target</Text>
       </View>
     </View>
   );

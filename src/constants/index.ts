@@ -25,12 +25,12 @@ export const COLORS = {
   black: '#1c1c1c',        // Dark text color (from style1.png)
   navy: '#1c1c1c',         // Navy/black - for consistent naming
   
-  // Heatmap colors
+  // Heatmap colors - green for close to target, red for far from target
   heatmap: {
-    low: '#d96c6c',        // Soft red
-    mid: '#e8a55c',        // Warm orange
-    high: '#1473b1',       // Blue
-    empty: '#cce3f6',      // Light background tint
+    low: '#d96c6c',        // Red - far from target
+    mid: '#e8a55c',        // Orange - medium distance
+    high: '#4CAF50',       // Green - close to target
+    empty: '#e8e8e8',      // Light gray for empty cells
   },
   
   // Chart colors - blue palette matching theme

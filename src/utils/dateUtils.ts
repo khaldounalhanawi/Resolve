@@ -59,7 +59,7 @@ export function getHeatmapColor(
   minValue: number,
   maxValue: number,
   targetValue?: number,
-  colors = { low: '#FF3B30', mid: '#FF9500', high: '#34C759' }
+  colors = { low: '#d96c6c', mid: '#e8a55c', high: '#4CAF50', empty: '#e8e8e8' }
 ): string {
   if (targetValue !== undefined) {
     // Calculate distance from target as a percentage
@@ -67,16 +67,17 @@ export function getHeatmapColor(
     const distance = Math.abs(value - targetValue);
     const distancePercent = distance / range;
     
-    if (distancePercent < 0.1) return colors.high;
-    if (distancePercent < 0.3) return colors.mid;
-    return colors.low;
+    // Green when very close to target, orange for medium, red for far
+    if (distancePercent < 0.15) return colors.high;  // Green - very close
+    if (distancePercent < 0.35) return colors.mid;   // Orange - medium distance
+    return colors.low;  // Red - far from target
   } else {
-    // Use value intensity
+    // When no target: use value intensity (higher values are better)
     const normalized = (value - minValue) / (maxValue - minValue);
     
-    if (normalized < 0.33) return colors.low;
-    if (normalized < 0.66) return colors.mid;
-    return colors.high;
+    if (normalized > 0.66) return colors.high;  // Green - high values
+    if (normalized > 0.33) return colors.mid;   // Orange - medium values
+    return colors.low;  // Red - low values
   }
 }
 
