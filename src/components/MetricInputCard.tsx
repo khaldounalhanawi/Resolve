@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.white,
     borderRadius: 8,
-    padding: 12,
+    padding: 16,
     marginBottom: 8,
     borderLeftWidth: 3,
     shadowColor: '#000',
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   metricName: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
     color: COLORS.black,
     width: 70,
@@ -143,18 +143,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     marginHorizontal: 8,
+    paddingVertical: 12,
+    minHeight: 60,
   },
   slider: {
     flex: 1,
-    height: 30,
+    height: 50,
   },
   minLabel: {
-    fontSize: 11,
+    fontSize: 12,
     color: COLORS.gray,
     width: 30,
   },
   maxLabel: {
-    fontSize: 11,
+    fontSize: 12,
     color: COLORS.gray,
     width: 30,
     textAlign: 'right',
@@ -169,24 +171,25 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     gap: 8,
+    marginTop: 4,
   },
   saveButton: {
     backgroundColor: COLORS.primary,
     borderRadius: 6,
-    paddingVertical: 8,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     alignItems: 'center',
     flex: 1,
   },
   saveButtonText: {
     color: COLORS.white,
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '600',
   },
   editButton: {
     backgroundColor: COLORS.background,
     borderRadius: 6,
-    paddingVertical: 8,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     alignItems: 'center',
     borderWidth: 1,
@@ -194,7 +197,7 @@ const styles = StyleSheet.create({
   },
   editButtonText: {
     color: COLORS.gray,
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '600',
   },
 });
