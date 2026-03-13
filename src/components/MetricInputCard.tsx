@@ -20,9 +20,10 @@ interface MetricInputCardProps {
   metric: Metric;
   currentValue: number;
   onSave: (value: number) => void;
+  onEdit?: () => void;
 }
 
-export function MetricInputCard({ metric, currentValue, onSave }: MetricInputCardProps) {
+export function MetricInputCard({ metric, currentValue, onSave, onEdit }: MetricInputCardProps) {
   const [sliderValue, setSliderValue] = useState(
     metric.aggregationType === 'accumulate' ? metric.minValue : currentValue
   );
@@ -86,11 +87,18 @@ export function MetricInputCard({ metric, currentValue, onSave }: MetricInputCar
         </Text>
       </View>
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>
-          {metric.aggregationType === 'accumulate' ? 'Add' : 'Update'}
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <Text style={styles.saveButtonText}>
+            {metric.aggregationType === 'accumulate' ? 'Add' : 'Update'}
+          </Text>
+        </TouchableOpacity>
+        {onEdit && (
+          <TouchableOpacity style={styles.editButton} onPress={onEdit}>
+            <Text style={styles.editButtonText}>✏️ Edit</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 }
@@ -158,16 +166,34 @@ const styles = StyleSheet.create({
     width: 60,
     textAlign: 'right',
   },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
   saveButton: {
     backgroundColor: COLORS.primary,
     borderRadius: 6,
     paddingVertical: 8,
     paddingHorizontal: 16,
     alignItems: 'center',
-    alignSelf: 'flex-end',
+    flex: 1,
   },
   saveButtonText: {
     color: COLORS.white,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  editButton: {
+    backgroundColor: COLORS.background,
+    borderRadius: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.lightGray,
+  },
+  editButtonText: {
+    color: COLORS.gray,
     fontSize: 13,
     fontWeight: '600',
   },

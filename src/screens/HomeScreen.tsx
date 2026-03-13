@@ -14,23 +14,27 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Animated,
+  Image,
 } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { useAppStore } from '../store';
 import { useMetricsWithTodayValues } from '../hooks';
-import { MetricInputCard, AddMetricModal } from '../components';
+import { MetricInputCard, AddMetricModal, EditMetricModal } from '../components';
 import { COLORS, SUGGESTED_METRICS } from '../constants';
 import { getTodayISO, formatDisplayDate } from '../utils/dateUtils';
 
 export function HomeScreen() {
   const user = useAppStore(state => state.user);
   const metrics = useAppStore(state => state.metrics);
+  const entries = useAppStore(state => state.entries);
   const isLoading = useAppStore(state => state.isLoading);
   const logValue = useAppStore(state => state.logValue);
   const addMetric = useAppStore(state => state.addMetric);
+  const updateMetric = useAppStore(state => state.updateMetric);
   const removeMetric = useAppStore(state => state.removeMetric);
   
   const [isAddModalVisible, setIsAddModalVisible] = React.useState(false);
+  const [editingMetric, setEditingMetric] = React.useState<any>(null);
   
   const metricsWithValues = useMetricsWithTodayValues();
   const today = getTodayISO();
@@ -38,6 +42,68 @@ export function HomeScreen() {
   const handleAddSuggestedMetrics = async () => {
     for (const suggestion of SUGGESTED_METRICS) {
       await addMetric(suggestion);
+    }
+  };
+
+  // Calculate progress statistics
+  const calculateProgress = () => {
+    if (entries.length === 0 || metrics.length === 0) {
+      return null;
+    }
+
+    // Get metrics with targets
+    const metricsWithTargets = metrics.filter(m => m.targetValue);
+    if (metricsWithTargets.length === 0) {
+      return null;
+    }
+
+    // Calculate days tracking
+    const allDates = [...new Set(entries.map(e => e.date))].sort();
+    const daysTracking = allDates.length;
+    const firstDate = allDates[0];
+    
+    // Calculate improvements
+    let improvedCount = 0;
+    
+    for (const metric of metricsWithTargets) {
+      const metricEntries = entries.filter(e => e.metricId === metric.id).sort((a, b) => a.date.localeCompare(b.date));
+      
+      if (metricEntries.length >= 2 && metric.targetValue) {
+        const firstEntry = metricEntries[0];
+        const recentEntries = metricEntries.slice(-7); // Last 7 days average
+        const recentAvg = recentEntries.reduce((sum, e) => sum + e.value, 0) / recentEntries.length;
+        
+        // Check if getting closer to target
+        const firstDistance = Math.abs(firstEntry.value - metric.targetValue);
+        const recentDistance = Math.abs(recentAvg - metric.targetValue);
+        
+        if (recentDistance < firstDistance) {
+          improvedCount++;
+        }
+      }
+    }
+
+    return {
+      improved: improvedCount > 0,
+      improvedCount,
+      totalWithTargets: metricsWithTargets.length,
+      daysTracking,
+      firstDate,
+    };
+  };
+
+  const progress = calculateProgress();
+
+  // Generate motivational message
+  const getMotivationalMessage = () => {
+    if (!progress) {
+      return null;
+    }
+
+    if (progress.improved) {
+      return `🎯 ${progress.improvedCount} metric${progress.improvedCount > 1 ? 's are' : ' is'} getting closer to target!`;
+    } else {
+      return `💪 Keep at it! You're already ${progress.daysTracking} day${progress.daysTracking > 1 ? 's' : ''} in!`;
     }
   };
 
@@ -105,9 +171,18 @@ export function HomeScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Hello, {user?.name || 'User'}! 👋</Text>
-          <Text style={styles.date}>{formatDisplayDate(today)}</Text>
+        <View style={styles.userSection}>
+          <Image 
+            source={user?.avatarUrl ? { uri: user.avatarUrl } : require('../../assets/Resolve_logo.png')}
+            style={styles.avatar}
+          />
+          <View>
+            <Text style={styles.greeting}>Hello, {user?.name || 'User'}! 👋</Text>
+            <Text style={styles.date}>{formatDisplayDate(today)}</Text>
+            {getMotivationalMessage() && (
+              <Text style={styles.motivation}>{getMotivationalMessage()}</Text>
+            )}
+          </View>
         </View>
         
         {metrics.length > 0 && (
@@ -132,6 +207,7 @@ export function HomeScreen() {
               metric={metric}
               currentValue={value}
               onSave={(newValue) => logValue(metric.id, newValue)}
+              onEdit={() => setEditingMetric(metric)}
             />
           </Swipeable>
         ))}
@@ -157,6 +233,13 @@ export function HomeScreen() {
         visible={isAddModalVisible}
         onClose={() => setIsAddModalVisible(false)}
         onAdd={(metric) => addMetric(metric)}
+      />
+
+      <EditMetricModal
+        visible={!!editingMetric}
+        metric={editingMetric}
+        onClose={() => setEditingMetric(null)}
+        onUpdate={(metricId, data) => updateMetric(metricId, data)}
       />
     </View>
   );
@@ -218,6 +301,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  userSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: COLORS.lightGray,
+  },
   greeting: {
     fontSize: 24,
     fontWeight: '700',
@@ -227,6 +322,12 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 14,
     color: COLORS.gray,
+  },
+  motivation: {
+    fontSize: 13,
+    color: COLORS.primary,
+    fontWeight: '600',
+    marginTop: 4,
   },
   statsPreview: {
     alignItems: 'flex-end',

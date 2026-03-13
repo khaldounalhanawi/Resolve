@@ -9,3 +9,4 @@ export { CalendarHeatmap } from './CalendarHeatmap';
 export { DayDetailModal } from './DayDetailModal';
 export { CorrelationGraph } from './CorrelationGraph';
 export { AddMetricModal } from './AddMetricModal';
+export { EditMetricModal } from './EditMetricModal';

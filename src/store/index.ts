@@ -25,6 +25,7 @@ interface AppState {
   // Metric actions
   loadMetrics: () => Promise<void>;
   addMetric: (data: CreateMetricDTO) => Promise<void>;
+  updateMetric: (metricId: string, data: Partial<CreateMetricDTO>) => Promise<void>;
   removeMetric: (metricId: string) => Promise<void>;
   
   // Entry actions
@@ -74,6 +75,20 @@ export const useAppStore = create<AppState>((set, get) => ({
       const metric = await metricService.createMetric(data);
       set(state => ({
         metrics: [...state.metrics, metric],
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({ error: (error as Error).message, isLoading: false });
+    }
+  },
+
+  // Update metric
+  updateMetric: async (metricId: string, data: Partial<CreateMetricDTO>) => {
+    try {
+      set({ isLoading: true, error: null });
+      const updatedMetric = await metricService.updateMetric(metricId, data);
+      set(state => ({
+        metrics: state.metrics.map(m => m.id === metricId ? updatedMetric : m),
         isLoading: false,
       }));
     } catch (error) {
