@@ -22,11 +22,12 @@ import { COLORS } from '../constants';
 interface MetricInputCardProps {
   metric: Metric;
   currentValue: number;
+  hasEntry?: boolean;
   onSave: (value: number) => void;
   onEdit?: () => void;
 }
 
-export function MetricInputCard({ metric, currentValue, onSave, onEdit }: MetricInputCardProps) {
+export function MetricInputCard({ metric, currentValue, hasEntry = false, onSave, onEdit }: MetricInputCardProps) {
   const [sliderValue, setSliderValue] = useState(
     metric.aggregationType === 'accumulate' ? metric.minValue : currentValue
   );
@@ -81,9 +82,13 @@ export function MetricInputCard({ metric, currentValue, onSave, onEdit }: Metric
           <View style={[styles.colorDot, { backgroundColor: metric.color || COLORS.primary }]} />
           <Text style={styles.metricName}>{metric.name}</Text>
         </View>
-        <Text style={styles.collapsedValue}>
-          {currentValue.toFixed(1)}{metric.unit || ''}
-        </Text>
+        {hasEntry || metric.aggregationType === 'accumulate' ? (
+          <Text style={styles.collapsedValue}>
+            {currentValue.toFixed(1)}{metric.unit || ''}
+          </Text>
+        ) : (
+          <Text style={styles.collapsedPlaceholder}>Log today</Text>
+        )}
       </TouchableOpacity>
     );
   }
@@ -211,6 +216,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: COLORS.primary,
+  },
+  collapsedPlaceholder: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: COLORS.lightGray,
+    fontStyle: 'italic',
   },
   headerRow: {
     flexDirection: 'row',

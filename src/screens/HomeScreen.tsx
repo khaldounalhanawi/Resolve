@@ -50,7 +50,8 @@ export function HomeScreen() {
       const todayEntry = entries.find(e => e.metricId === metric._id);
       return {
         metric,
-        value: todayEntry?.value || (metric.aggregationType === 'accumulate' ? 0 : metric.minValue)
+        value: todayEntry?.value ?? (metric.aggregationType === 'accumulate' ? 0 : metric.minValue),
+        hasEntry: todayEntry !== undefined,
       };
     });
   }, [metrics, entries]);
@@ -167,7 +168,7 @@ export function HomeScreen() {
         nestedScrollEnabled={true}
       >
         <Text style={styles.sectionTitle}>Categories</Text>
-        {metricsWithValues.map(({ metric, value }) => (
+        {metricsWithValues.map(({ metric, value, hasEntry }) => (
           <Swipeable
             key={metric._id}
             renderRightActions={renderRightActions(metric._id)}
@@ -178,6 +179,7 @@ export function HomeScreen() {
             <MetricInputCard
               metric={metric}
               currentValue={value}
+              hasEntry={hasEntry}
               onSave={(newValue) => handleLogValue(metric._id, newValue)}
               onEdit={() => setEditingMetric(metric)}
             />
