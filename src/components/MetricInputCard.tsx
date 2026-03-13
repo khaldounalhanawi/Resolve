@@ -88,6 +88,7 @@ export function MetricInputCard({ metric, currentValue, onSave, onEdit }: Metric
           minimumTrackTintColor={metric.color || COLORS.primary}
           maximumTrackTintColor={COLORS.secondary}
           thumbTintColor={metric.color || COLORS.primary}
+          step={(metric.maxValue - metric.minValue) / 100}
         />
         <View style={styles.sliderLabels}>
           <Text style={styles.minLabel}>{metric.minValue}</Text>
@@ -164,15 +165,18 @@ const styles = StyleSheet.create({
   sliderContainer: {
     flexDirection: 'column',
     marginBottom: 12,
+    paddingVertical: 8,
   },
   slider: {
     width: '100%',
-    height: 40,
+    height: 80,
+    marginVertical: 4,
   },
   sliderLabels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 4,
+    paddingHorizontal: 8,
+    marginTop: 4,
   },
   minLabel: {
     fontSize: 12,

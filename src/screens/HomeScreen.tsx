@@ -109,12 +109,17 @@ export function HomeScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled={true}
       >
         <Text style={styles.sectionTitle}>Categories</Text>
         {metricsWithValues.map(({ metric, value }) => (
           <Swipeable
             key={metric.id}
             renderRightActions={renderRightActions(metric.id)}
+            activeOffsetX={[-20, 20]}
+            overshootLeft={false}
+            overshootRight={false}
           >
             <MetricInputCard
               metric={metric}
