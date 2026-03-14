@@ -108,15 +108,6 @@ export function CalendarScreen() {
         </ScrollView>
       </View>
 
-      <View style={styles.monthNavigation}>
-        <TouchableOpacity onPress={handlePrevMonth} style={styles.navButton}>
-          <Text style={styles.navButtonText}>←</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleNextMonth} style={styles.navButton}>
-          <Text style={styles.navButtonText}>→</Text>
-        </TouchableOpacity>
-      </View>
-
       <ScrollView style={styles.scrollView}>
         {selectedMetric && (
           <CalendarHeatmap
@@ -124,6 +115,8 @@ export function CalendarScreen() {
             entries={metricEntries}
             onDayPress={handleDayPress}
             currentMonth={currentMonth}
+            onPrevMonth={handlePrevMonth}
+            onNextMonth={handleNextMonth}
           />
         )}
       </ScrollView>
@@ -198,21 +191,6 @@ const styles = StyleSheet.create({
   metricTabTextActive: {
     color: COLORS.white,
     fontWeight: '600',
-  },
-  monthNavigation: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 12,
-    backgroundColor: COLORS.white,
-  },
-  navButton: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: COLORS.background,
-  },
-  navButtonText: {
-    fontSize: 24,
-    color: COLORS.primary,
   },
   scrollView: {
     flex: 1,

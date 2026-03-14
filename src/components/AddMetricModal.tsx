@@ -212,7 +212,7 @@ export function AddMetricModal({ visible, onClose, onAdd }: AddMetricModalProps)
             </View>
 
             <View style={styles.switchGroup}>
-              <View>
+              <View style={styles.switchLabel}>
                 <Text style={styles.label}>Accumulate Values</Text>
                 <Text style={styles.hint}>
                   Enable for metrics that add up during the day (e.g., water, steps)
@@ -367,6 +367,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
+  },
+  switchLabel: {
+    flex: 1,
+    paddingRight: 16,
   },
   footer: {
     flexDirection: 'row',

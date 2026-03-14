@@ -23,6 +23,8 @@ interface CalendarHeatmapProps {
   entries: Entry[];
   onDayPress: (date: string) => void;
   currentMonth: Date;
+  onPrevMonth: () => void;
+  onNextMonth: () => void;
 }
 
 export function CalendarHeatmap({
@@ -30,6 +32,8 @@ export function CalendarHeatmap({
   entries,
   onDayPress,
   currentMonth,
+  onPrevMonth,
+  onNextMonth,
 }: CalendarHeatmapProps) {
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -204,7 +208,15 @@ export function CalendarHeatmap({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{format(currentMonth, 'MMMM yyyy')}</Text>
+      <View style={styles.monthHeader}>
+        <TouchableOpacity onPress={onPrevMonth} style={styles.monthNavButton}>
+          <Text style={styles.monthNavText}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>{format(currentMonth, 'MMMM yyyy')}</Text>
+        <TouchableOpacity onPress={onNextMonth} style={styles.monthNavButton}>
+          <Text style={styles.monthNavText}>→</Text>
+        </TouchableOpacity>
+      </View>
       
       <View style={styles.weekDaysRow}>
         {weekDays.map(day => (
@@ -315,11 +327,28 @@ const styles = StyleSheet.create({
     margin: 8,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     color: COLORS.black,
-    marginBottom: 16,
     textAlign: 'center',
+    flex: 1,
+  },
+  monthHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+    paddingHorizontal: 4,
+  },
+  monthNavButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: COLORS.background,
+  },
+  monthNavText: {
+    fontSize: 20,
+    color: COLORS.primary,
+    fontWeight: '600',
   },
   weekDaysRow: {
     flexDirection: 'row',
