@@ -61,3 +61,23 @@ export const updateUser = mutation({
     return await ctx.db.get(userId);
   },
 });
+
+// Generate a short-lived upload URL for Convex file storage
+export const generateAvatarUploadUrl = mutation({
+  handler: async (ctx) => {
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+// Save uploaded avatar: resolve storage ID → URL, persist on user record
+export const saveUserAvatar = mutation({
+  args: {
+    userId: v.id("users"),
+    storageId: v.id("_storage"),
+  },
+  handler: async (ctx, args) => {
+    const url = await ctx.storage.getUrl(args.storageId);
+    await ctx.db.patch(args.userId, { avatarUrl: url ?? undefined });
+    return url;
+  },
+});

@@ -52,6 +52,7 @@ export const COLORS = {
 export const DATE_FORMATS = {
   ISO_DATE: 'yyyy-MM-dd',
   DISPLAY_DATE: 'MMM dd, yyyy',
+  WEEKDAY_DATE: "EEEE, dd.MM.yyyy",
   DISPLAY_MONTH: 'MMMM yyyy',
 };
 
@@ -59,11 +60,11 @@ export const DATE_FORMATS = {
  * Default metric color mapping
  */
 export const METRIC_COLORS: Record<string, string> = {
-  Weight: '#1473b1',
-  Sleep: '#0f81e6',
-  Mood: '#1473b1',
-  Calories: '#5aa4d4',
-  Steps: '#7fb9e3',
+  Weight:   '#E8737B', // dusty rose
+  Sleep:    '#6B9FD4', // steel blue
+  Mood:     '#E8B84B', // golden amber
+  Calories: '#5BBF8A', // sage green
+  Steps:    '#A07BD4', // dusty violet
 };
 
 /**

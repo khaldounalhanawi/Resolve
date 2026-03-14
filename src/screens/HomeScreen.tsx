@@ -14,14 +14,17 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Animated,
+  Image,
+  Alert,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { Swipeable } from 'react-native-gesture-handler';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { useAuth } from '../contexts/AuthContext';
 import { MetricInputCard, AddMetricModal, EditMetricModal } from '../components';
 import { COLORS, SUGGESTED_METRICS } from '../constants';
-import { getTodayISO, formatDisplayDate } from '../utils/dateUtils';
+import { getTodayISO, formatWeekdayDate } from '../utils/dateUtils';
 
 export function HomeScreen() {
   const { userId } = useAuth();
@@ -38,6 +41,8 @@ export function HomeScreen() {
   const deleteMetric = useMutation(api.metrics.deleteMetric);
   const upsertEntry = useMutation(api.entries.upsertEntry);
   const accumulateEntry = useMutation(api.entries.accumulateEntry);
+  const generateUploadUrl = useMutation(api.users.generateAvatarUploadUrl);
+  const saveAvatar = useMutation(api.users.saveUserAvatar);
   
   const [isAddModalVisible, setIsAddModalVisible] = React.useState(false);
   const [editingMetric, setEditingMetric] = React.useState<any>(null);
@@ -95,6 +100,35 @@ export function HomeScreen() {
       ...data,
       color: data.color || COLORS.primary
     });
+  };
+
+  const handleAvatarPress = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert('Permission needed', 'Please allow access to your photo library to change your avatar.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.6,
+    });
+    if (result.canceled || !userId) return;
+    try {
+      const uploadUrl = await generateUploadUrl();
+      const response = await fetch(result.assets[0].uri);
+      const blob = await response.blob();
+      const upload = await fetch(uploadUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': result.assets[0].mimeType ?? 'image/jpeg' },
+        body: blob,
+      });
+      const { storageId } = await upload.json();
+      await saveAvatar({ userId, storageId });
+    } catch (e) {
+      Alert.alert('Error', 'Failed to upload avatar. Please try again.');
+    }
   };
 
   const renderRightActions = (metricId: string) => (
@@ -156,8 +190,19 @@ export function HomeScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>Hello, {user?.name || 'User'}! 👋</Text>
-        <Text style={styles.date}>{formatDisplayDate(today)}</Text>
+        <View style={styles.headerContent}>
+          <TouchableOpacity style={styles.avatarContainer} onPress={handleAvatarPress}>
+            <Image
+              source={user?.avatarUrl ? { uri: user.avatarUrl } : require('../../assets/logo.png')}
+              style={styles.avatar}
+            />
+          </TouchableOpacity>
+          <View style={styles.headerText}>
+            <Text style={styles.greeting}>Hello, {user?.name || 'User'}!</Text>
+            <Text style={styles.subGreeting} numberOfLines={2}>Are you ready for a brand new day?</Text>
+            <Text style={styles.date}>{formatWeekdayDate(today)}</Text>
+          </View>
+        </View>
       </View>
 
       <ScrollView
@@ -267,14 +312,42 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     backgroundColor: COLORS.background,
   },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  headerText: {
+    flex: 1,
+    flexShrink: 1,
+  },
+  avatarContainer: {
+    borderRadius: 50,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
   greeting: {
     fontSize: 28,
     fontWeight: '700',
     color: COLORS.black,
+    marginBottom: 2,
+  },
+  subGreeting: {
+    fontSize: 14,
+    color: COLORS.gray,
     marginBottom: 4,
   },
   date: {
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.gray,
   },
   scrollView: {
@@ -309,7 +382,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   addButton: {
-    backgroundColor: COLORS.white,
     borderRadius: 16,
     padding: 20,
     marginTop: 12,
@@ -319,11 +391,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
   },
   addButtonIcon: {
     fontSize: 24,

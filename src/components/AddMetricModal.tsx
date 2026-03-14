@@ -25,8 +25,18 @@ interface AddMetricModalProps {
 }
 
 const METRIC_COLORS = [
-  '#355176', '#8db8d4', '#3ca55e', '#5a9fb8', 
-  '#6abf7e', '#4d6a89', '#a8c9db', '#58b378'
+  '#E8737B', // dusty rose
+  '#E8944B', // burnt orange
+  '#E8B84B', // golden amber
+  '#9DBF5B', // olive green
+  '#5BBF8A', // sage green
+  '#4BBFB0', // teal
+  '#4B9BDB', // cornflower blue
+  '#6B9FD4', // steel blue
+  '#7B7BD4', // slate violet
+  '#A07BD4', // dusty violet
+  '#CA6BB8', // mauve
+  '#D46B8A', // raspberry
 ];
 
 export function AddMetricModal({ visible, onClose, onAdd }: AddMetricModalProps) {

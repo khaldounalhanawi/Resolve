@@ -87,7 +87,7 @@ export function MetricInputCard({ metric, currentValue, hasEntry = false, onSave
             {currentValue.toFixed(1)}{metric.unit || ''}
           </Text>
         ) : (
-          <Text style={styles.collapsedPlaceholder}>Log today</Text>
+          <Text style={styles.collapsedPlaceholder}>Log today's</Text>
         )}
       </TouchableOpacity>
     );

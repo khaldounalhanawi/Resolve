@@ -22,6 +22,13 @@ export function formatDisplayDate(dateString: string): string {
 }
 
 /**
+ * Format a date string as "Tuesday, 12.03.2026"
+ */
+export function formatWeekdayDate(dateString: string): string {
+  return format(parseISO(dateString), DATE_FORMATS.WEEKDAY_DATE);
+}
+
+/**
  * Format a date string for month display
  */
 export function formatDisplayMonth(dateString: string): string {
