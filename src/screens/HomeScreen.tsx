@@ -131,32 +131,14 @@ export function HomeScreen() {
     }
   };
 
-  const renderRightActions = (metricId: string) => (
-    progress: Animated.AnimatedInterpolation<number>,
-    dragX: Animated.AnimatedInterpolation<number>
-  ) => {
-    const trans = dragX.interpolate({
-      inputRange: [-100, 0],
-      outputRange: [0, 100],
-      extrapolate: 'clamp',
-    });
-
+  const renderRightActions = (metricId: string) => () => {
     return (
-      <Animated.View
-        style={[
-          styles.deleteAction,
-          {
-            transform: [{ translateX: trans }],
-          },
-        ]}
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => handleRemoveMetric(metricId)}
       >
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => handleRemoveMetric(metricId)}
-        >
-          <Text style={styles.deleteButtonText}>Delete</Text>
-        </TouchableOpacity>
-      </Animated.View>
+        <Text style={styles.deleteButtonText}>Delete</Text>
+      </TouchableOpacity>
     );
   };
 
@@ -363,16 +345,12 @@ const styles = StyleSheet.create({
     color: COLORS.black,
     marginBottom: 16,
   },
-  deleteAction: {
+  deleteButton: {
     backgroundColor: COLORS.error,
-    justifyContent: 'center',
-    alignItems: 'flex-end',
+    width: 90,
     borderRadius: 16,
     marginBottom: 12,
-  },
-  deleteButton: {
-    width: 80,
-    height: '100%',
+    marginLeft: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
