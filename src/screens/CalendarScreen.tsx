@@ -76,36 +76,7 @@ export function CalendarScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Calendar</Text>
-      </View>
-
-      <View style={styles.metricSelector}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.metricTabsContainer}>
-          {metrics.map((metric, index) => {
-            const isSelected = selectedMetricIndex === index;
-            return (
-              <TouchableOpacity
-                key={metric._id}
-                style={[
-                  styles.metricTab,
-                  isSelected && {
-                    backgroundColor: metric.color || COLORS.primary,
-                  },
-                ]}
-                onPress={() => setSelectedMetricIndex(index)}
-              >
-                <Text
-                  style={[
-                    styles.metricTabText,
-                    isSelected && styles.metricTabTextActive,
-                  ]}
-                >
-                  {metric.name}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+        <Text style={styles.title}>Your progress this month</Text>
       </View>
 
       <ScrollView style={styles.scrollView}>
@@ -117,6 +88,9 @@ export function CalendarScreen() {
             currentMonth={currentMonth}
             onPrevMonth={handlePrevMonth}
             onNextMonth={handleNextMonth}
+            metrics={metrics}
+            selectedMetricIndex={selectedMetricIndex}
+            onSelectMetric={setSelectedMetricIndex}
           />
         )}
       </ScrollView>
@@ -153,44 +127,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   header: {
-    padding: 20,
-    paddingTop: 20,
-    paddingBottom: 12,
-    backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.lightGray,
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 16,
+    backgroundColor: COLORS.background,
   },
   title: {
-    fontSize: 20,
+    fontSize: 26,
     fontWeight: '700',
     color: COLORS.black,
-  },
-  metricSelector: {
-    backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.lightGray,
-  },
-  metricTabsContainer: {
-    alignItems: 'center',
-  },
-  metricTab: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginHorizontal: 4,
-    borderRadius: 20,
-    backgroundColor: COLORS.lightGray,
-  },
-  metricTabActive: {
-    // backgroundColor will be set dynamically based on metric color
-  },
-  metricTabText: {
-    fontSize: 13,
-    color: COLORS.gray,
-    fontWeight: '600',
-  },
-  metricTabTextActive: {
-    color: COLORS.white,
-    fontWeight: '600',
   },
   scrollView: {
     flex: 1,

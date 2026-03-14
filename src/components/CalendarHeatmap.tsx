@@ -25,6 +25,9 @@ interface CalendarHeatmapProps {
   currentMonth: Date;
   onPrevMonth: () => void;
   onNextMonth: () => void;
+  metrics: Metric[];
+  selectedMetricIndex: number;
+  onSelectMetric: (index: number) => void;
 }
 
 export function CalendarHeatmap({
@@ -34,6 +37,9 @@ export function CalendarHeatmap({
   currentMonth,
   onPrevMonth,
   onNextMonth,
+  metrics,
+  selectedMetricIndex,
+  onSelectMetric,
 }: CalendarHeatmapProps) {
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -208,6 +214,26 @@ export function CalendarHeatmap({
 
   return (
     <View style={styles.container}>
+      <View style={styles.metricTabs}>
+        {metrics.map((m, index) => {
+          const isSelected = selectedMetricIndex === index;
+          return (
+            <TouchableOpacity
+              key={m._id}
+              style={[
+                styles.metricTab,
+                isSelected && { backgroundColor: m.color || COLORS.primary },
+              ]}
+              onPress={() => onSelectMetric(index)}
+            >
+              <Text style={[styles.metricTabText, isSelected && styles.metricTabTextActive]}>
+                {m.name}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
       <View style={styles.monthHeader}>
         <TouchableOpacity onPress={onPrevMonth} style={styles.monthNavButton}>
           <Text style={styles.monthNavText}>←</Text>
@@ -325,6 +351,28 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 12,
     margin: 8,
+  },
+  metricTabs: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 20,
+    justifyContent: 'center',
+  },
+  metricTab: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
+    backgroundColor: COLORS.lightGray,
+  },
+  metricTabText: {
+    fontSize: 13,
+    color: COLORS.gray,
+    fontWeight: '600',
+  },
+  metricTabTextActive: {
+    color: COLORS.white,
+    fontWeight: '600',
   },
   title: {
     fontSize: 18,
